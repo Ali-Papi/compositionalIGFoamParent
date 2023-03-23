@@ -61,8 +61,7 @@ inline Foam::multiscalarMixture::multiscalarMixture
 
         Info<< nl << "******** Specie " << speciesNames[speciesi] << porousRegion << " ********" << endl;
 
-        dictionary specieDict(dict.optionalSubDict(speciesNames[speciesi]));
-        specieDict = specieDict.optionalSubDict(porousRegion);
+        dictionary specieDict(dict.optionalSubDict(speciesNames[speciesi]).optionalSubDict(porousRegion));
         dictionary porousTransport(specieDict.subDict("porousTransport"));
 
         dimensionedScalar Kd(porousTransport.lookupOrDefault("Kd", dimensionedScalar(dimensionSet(-1,3,0,0,0), 0)));
@@ -109,6 +108,7 @@ inline Foam::multiscalarMixture::multiscalarMixture
                 // calculatedFvPatchField<scalar>::typeName
                 zeroGradientFvPatchField<scalar>::typeName
             )
+
         );
         R_[speciesi].primitiveFieldRef() = 1 + (1-epsTotal_[speciesi]) * rs_[speciesi] * Kd_[speciesi] / eps_;
         Info << "Min(R) = " << gMin(R_[speciesi]) << " Max(R) = " << gMax(R_[speciesi]) << endl;

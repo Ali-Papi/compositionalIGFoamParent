@@ -133,12 +133,6 @@ public:
             const fvPatchFieldMapper&
         );
 
-        //- Disallow copy without setting internal field reference
-        eventInfiltration
-        (
-            const eventInfiltration&
-        ) = delete ;
-
         //- Construct as copy setting internal field reference
         eventInfiltration
         (

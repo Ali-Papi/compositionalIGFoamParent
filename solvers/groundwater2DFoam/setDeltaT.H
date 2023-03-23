@@ -49,7 +49,7 @@ if (adjustTimeStep)
         scalar timeOfNextEvent = GREAT;
         if (infiltrationEventIsPresent) timeOfNextEvent = min(timeOfNextEvent,infiltrationEvent.currentEventEndTime());
 
-        scalar timeToNextEvent = timeOfNextEvent-runTime.timeOutputValue();
+        scalar timeToNextEvent = timeOfNextEvent-runTime.userTimeValue();
         scalar nSteps =  timeToNextEvent/runTime.deltaTValue();
         if ((nSteps < labelMax) && (nSteps != 0))
         {
@@ -63,9 +63,9 @@ if (adjustTimeStep)
             scalar timeToCloseEvent = GREAT;
             if (infiltrationEventIsPresent)
             {
-                if (infiltrationEvent.currentEventEndTime() != runTime.timeOutputValue())
+                if (infiltrationEvent.currentEventEndTime() != runTime.userTimeValue())
                 {
-                    timeToCloseEvent = min(timeToCloseEvent,infiltrationEvent.currentEventEndTime()-runTime.timeOutputValue());
+                    timeToCloseEvent = min(timeToCloseEvent,infiltrationEvent.currentEventEndTime()-runTime.userTimeValue());
                 }
             }
             runTime.setDeltaTNoAdjust(min(runTime.deltaTValue(),timeToCloseEvent));

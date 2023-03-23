@@ -1,7 +1,7 @@
 //- write using event file
 if (outputEventIsPresent)
 {
-    if (outputEvent.currentEventEndTime() <= runTime.timeOutputValue())
+    if (outputEvent.currentEventEndTime() <= runTime.userTimeValue())
     {
         forAll(composition.Y(), speciesi)
         {
@@ -20,7 +20,7 @@ if (outputEventIsPresent)
                 {
                     if (mesh.boundaryMesh()[patchi].type() == "patch")
                     {
-                        CmassBalanceCSV << " " << sum(phi.boundaryField()[patchi]*C_interpolated.boundaryField()[patchi]);
+                        CmassBalanceCSV << " " << gSum(phi.boundaryField()[patchi]*C_interpolated.boundaryField()[patchi]);
                     }
                 }
                 CmassBalanceCSV << endl;
@@ -28,7 +28,7 @@ if (outputEventIsPresent)
             }
         }
 
-        outputEvent.updateIndex(runTime.timeOutputValue());
+        outputEvent.updateIndex(runTime.userTimeValue());
     }
 }
 //- write using openfoam usual runTime
@@ -51,7 +51,7 @@ else
             {
                 if (mesh.boundaryMesh()[patchi].type() == "patch")
                 {
-                    CmassBalanceCSV << " " << sum(phi.boundaryField()[patchi]*C.boundaryField()[patchi]);
+                    CmassBalanceCSV << " " << gSum(phi.boundaryField()[patchi]*C.boundaryField()[patchi]);
                 }
             }
             CmassBalanceCSV << endl;

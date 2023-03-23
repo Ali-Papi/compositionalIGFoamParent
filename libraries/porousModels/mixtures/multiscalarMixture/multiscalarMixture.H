@@ -39,11 +39,10 @@ SourceFiles
 #ifndef multiscalarMixture_H
 #define multiscalarMixture_H
 
-#include "basicMixture.H"
-
 #include "volFields.H"
 #include "PtrList.H"
 #include "speciesTable.H"
+#include "typeInfo.H"
 
 #include "dispersionModel.H"
 #include "sourceEventFile.H"
@@ -58,8 +57,6 @@ namespace Foam
 \*---------------------------------------------------------------------------*/
 
 class multiscalarMixture
-:
-    public basicMixture
 {
 
 public:
@@ -67,85 +64,84 @@ public:
     //- Run time type information
     TypeName("multiscalarMixture");
 
-
     //- The base class of the mixture
     typedef multiscalarMixture basicMixtureType;
 
-
     // Constructors
 
-        //- Construct from dictionary, species names, mesh and phase name
-        template<typename EpsType>
-        inline multiscalarMixture
-        (
-            const dictionary& dict,
-            const wordList& speciesNames,
-            const fvMesh& mesh,
-            const word& phaseName,
-            const EpsType& eps,
-            List<sourceEventFile*>* sourceEventFileRegistry = nullptr,
-            const word& sourceEventDtFieldNameOverride = "",
-            const dimensionSet& sourceTermDimFactor = dimless
-        );
-
-        virtual ~multiscalarMixture()
-        {}
+    //- Construct from dictionary, species names, mesh and phase name
+    inline multiscalarMixture
+    (
+        const dictionary& dict,
+        const wordList& speciesNames,
+        const fvMesh& mesh,
+        const word& phaseName,
+        const volScalarField& eps,
+        List<sourceEventFile*>* sourceEventFileRegistry = nullptr,
+        const word& sourceEventDtFieldNameOverride = "",
+        const dimensionSet& sourceTermDimFactor = dimless,
+        const word& porousRegion = ""
+    );
 
     // Member Functions
 
-        //- Return the table of species
-        inline const speciesTable& species() const;
+    //- Return the table of species
+    inline const speciesTable& species() const;
 
-        //- Does the mixture include this specie?
-        inline bool contains(const word& specieName) const;
+    //- Does the mixture include this specie?
+    inline bool contains(const word& specieName) const;
 
-        //- Return the mass-fraction fields
-        inline PtrList<volScalarField>& Y();
+    //- Return the mass-fraction fields
+    inline PtrList<volScalarField>& Y();
 
-        //- Return the const mass-fraction fields
-        inline const PtrList<volScalarField>& Y() const;
+    //- Return the const mass-fraction fields
+    inline const PtrList<volScalarField>& Y() const;
 
-        //- Return the mass-fraction field for a specie given by index
-        inline volScalarField& Y(const label i);
+    //- Return the mass-fraction field for a specie given by index
+    inline volScalarField& Y(const label i);
 
-        //- Return the const mass-fraction field for a specie given by index
-        inline const volScalarField& Y(const label i) const;
+    //- Return the const mass-fraction field for a specie given by index
+    inline const volScalarField& Y(const label i) const;
 
-        //- Return the mass-fraction field for a specie given by name
-        inline volScalarField& Y(const word& specieName);
+    //- Return the mass-fraction field for a specie given by name
+    inline volScalarField& Y(const word& specieName);
 
-        //- Return the const mass-fraction field for a specie given by name
-        const volScalarField& Y(const word& specieName) const;
+    //- Return the const mass-fraction field for a specie given by name
+    const volScalarField& Y(const word& specieName) const;
 
-        //- Retard coefficient [-]
-        inline const volScalarField& R(const label speciesi) const;
+    //- Retard coefficient [-]
+    inline const volScalarField& R(const label speciesi) const;
 
-        //- Decay coefficient [1/s]
-        inline const dimensionedScalar& lambda(const label speciesi) const;
+    //- Decay coefficient [1/s]
+    inline const dimensionedScalar& lambda(const label speciesi) const;
 
-        //- Update effective diffusivities and source terms
-        template<typename ThetaType>
-        inline void correct
-        (
-            const volVectorField& U,
-            const ThetaType& theta
-        );
+    //- Update effective diffusivities and source terms
+    inline void correct
+    (
+        const volVectorField& U,
+        const volScalarField& theta
+    );
 
-        template<typename SaturationType, typename EpsType>
-        inline void correct
-        (
-            const volVectorField& U,
-            const SaturationType& saturation,
-            const EpsType& eps
-        );
+    inline void correct
+    (
+        const volVectorField& U,
+        const volScalarField& saturation,
+        const volScalarField& eps
+    );
 
+    //-  Molar diffusivity [m^2/s]
+    inline const dimensionedScalar& Dm(const label speciesi) const;
 
-        //- Effective diffusivity [m^2/s]
-        inline const volTensorField& Deff(const label speciesi) const;
+    //- Effective diffusivity [m^2/s]
+    inline const volTensorField& Deff(const label speciesi) const;
 
+    //- Source term [Y(speciesi).dimensions()*sourceTermDimFactor/s]
+    inline const volScalarField& sourceTerm(const label speciesi) const;
 
-        //- Source term [Y(speciesi).dimensions()*sourceTermDimFactor/s]
-        inline const volScalarField& sourceTerm(const label speciesi) const;
+    const PtrList<sourceEventFile>& sourceEvents() const {return sourceEvents_;}
+
+    //- Check if eps is defined (for retard coefficient)
+    bool check_eps();
 
 private:
     speciesTable species_;
@@ -158,6 +154,7 @@ private:
     List<dimensionedScalar> Kd_;
     List<dimensionedScalar> rs_;
     List<dimensionedScalar> epsTotal_;
+    const volScalarField& eps_;
 
 };
 

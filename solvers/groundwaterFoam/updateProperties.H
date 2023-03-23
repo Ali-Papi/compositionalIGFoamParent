@@ -2,7 +2,7 @@
 theta = pcModel->correctAndSb(h);
 
 //- relative permeability computation
-krModel->correctb();
+krModel->correctkrb(theta);
 krthetaf = fvc::interpolate(krtheta,"krtheta");
 
 //- mobility computation 
@@ -24,24 +24,13 @@ forAll(mesh.boundary(),patchi)
 h.correctBoundaryConditions();
 
 //- Compute h equation residual
-ResiduN = Ss*pcModel->Se() * fvc::ddt(h)
-    + massConservativeTerms * fvc::ddt(theta)
-    + (1 - massConservativeTerms) * pcModel->Ch() * fvc::ddt(h)
-    - fvc::laplacian(Mf,h)
-    + fvc::div(phiG)
-    + sourceTerm;
+ResiduN = - fvc::laplacian(Mf,h) + fvc::div(phiG) + porousModel->exchangeTerm() + sourceTerm;
+if (!steady)
+{
+    ResiduN += Ss*pcModel->Se() * fvc::ddt(h);
+    if (massConservative) ResiduN += fvc::ddt(theta);
+    else ResiduN += pcModel->Ch() * fvc::ddt(h);
+}
 
 forAll(fixedPotentialIDList, pointi) ResiduN[fixedPotentialIDList[pointi]]=0;
-
-scalar hEqnResidualMax = gMax(ResiduN.internalField());
-scalar hEqnResidualMin = gMin(ResiduN.internalField());
-if (mag(hEqnResidualMax) < mag(hEqnResidualMin))
-{
-    hEqnResidual = mag(hEqnResidualMin);
-    hEqnResidualSigned = hEqnResidualMin;
-}
-else
-{
-    hEqnResidual = mag(hEqnResidualMax);
-    hEqnResidualSigned = hEqnResidualMax;
-}
+hEqnResidual = gMax(mag(ResiduN.internalField())());

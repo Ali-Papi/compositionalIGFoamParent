@@ -103,7 +103,10 @@ volScalarField eps
     epsScalar
 );
 
-if (gMax(eps) <= 0) FatalErrorIn("createFields.H") << " porosity eps equal to 0" << exit(FatalError);
+if (!steady)
+{
+    if (gMax(eps) <= 0) FatalErrorIn("createFields.H") << " porosity eps equal to 0" << exit(FatalError);
+}
 
 // Intrinsic permeability
 Info<< nl << "Reading permeability field K" << endl;
@@ -115,7 +118,7 @@ volScalarField K
         runTime.constant(),
         mesh,
         IOobject::MUST_READ,
-        IOobject::AUTO_WRITE
+        IOobject::NO_WRITE
     ),
     mesh
 );

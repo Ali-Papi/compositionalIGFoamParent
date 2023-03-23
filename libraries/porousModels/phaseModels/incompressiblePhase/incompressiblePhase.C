@@ -31,7 +31,6 @@ License
 #include "fixedValueFvPatchFields.H"
 #include "linear.H"
 
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 Foam::incompressiblePhase::incompressiblePhase
@@ -42,35 +41,11 @@ Foam::incompressiblePhase::incompressiblePhase
 )
 :
     fluidPhase(mesh,transportProperties,phaseName),
-    mu_(dict_.lookup("mu")),
-    rho_(dict_.lookup("rho"))
+    phaseDict_(transportProperties.optionalSubDict("phase."+phaseName)),
+    mu_(phaseDict_.lookup("mu")),
+    rho_(phaseDict_.lookup("rho"))
 {   
-    const word phiName = "phi" + phaseName;
-
-    wordList phiTypes
-        (
-            U_.boundaryField().size(),
-            calculatedFvPatchScalarField::typeName
-        );
-
-    phiPtr_.reset
-        (
-            new surfaceScalarField
-            (
-                IOobject
-                (
-                    phiName,
-                    mesh.time().timeName(),
-                    mesh,
-                    IOobject::NO_READ,
-                    IOobject::AUTO_WRITE
-                ),
-                Foam::linearInterpolate(U_) & mesh.Sf(),
-                phiTypes
-            )
-        );
 }
-
 
 Foam::autoPtr<Foam::incompressiblePhase> Foam::incompressiblePhase::New
 (
@@ -89,6 +64,5 @@ Foam::autoPtr<Foam::incompressiblePhase> Foam::incompressiblePhase::New
 
 Foam::incompressiblePhase::~incompressiblePhase()
 {}
-
 
 // ************************************************************************* //

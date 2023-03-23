@@ -51,104 +51,77 @@ addToRunTimeSelectionTable
 
 Foam::relativePermeabilityModels::krBrooksAndCorey::krBrooksAndCorey
 (
-    const word& name,
+    const fvMesh& mesh,
     const dictionary& transportProperties,
-    const volScalarField& Sb
+    const word& Sname,
+    const word porousRegion
 )
     :
-    relativePermeabilityModel(name, transportProperties,Sb),
-    Smin_
-    (
-        IOobject
-        (
-            Sb_.name()+"min",
-            Sb_.time().timeName(),
-            Sb_.db(),
-            IOobject::READ_IF_PRESENT,
-            IOobject::NO_WRITE
-        ),
-        Sb.mesh(),
-        transportProperties.lookupOrDefault(Sb_.name()+"min",dimensionedScalar(Sb_.name()+"min",dimless,0))
-    ),
-    Smax_
-    (
-        IOobject
-        (
-            Sb_.name()+"max",
-            Sb_.time().timeName(),
-            Sb_.db(),
-            IOobject::READ_IF_PRESENT,
-            IOobject::NO_WRITE
-        ),
-        Sb.mesh(),
-        transportProperties.lookupOrDefault(Sb_.name()+"max",dimensionedScalar(Sb_.name()+"max",dimless,0))
-    ),
-    krBrooksAndCoreyCoeffs_(transportProperties.subDict(typeName + "Coeffs")),
+    relativePermeabilityModel(mesh, transportProperties.subDict(typeName + "Coeffs"), Sname, porousRegion),
     n_
     (
         IOobject
         (
-            "n",
-            Sb_.time().timeName(),
-            Sb_.db(),
+            "n"+porousRegion,
+            mesh.time().timeName(),
+            mesh,
             IOobject::READ_IF_PRESENT,
             IOobject::NO_WRITE
         ),
-        Sb.mesh(),
-        dimensionedScalar("n",dimless,krBrooksAndCoreyCoeffs_.lookupOrDefault<scalar>("n",0))
+        mesh,
+        dimensionedScalar(dimless, modelProperties_.lookupOrDefault<scalar>("n"+porousRegion,0))
     ),
     kramax_
     (
         IOobject
         (
-            "kr"+Sb_.name()+"max",
-            Sb_.time().timeName(),
-            Sb_.db(),
+            "kr"+Sname+"max"+porousRegion,
+            mesh.time().timeName(),
+            mesh,
             IOobject::READ_IF_PRESENT,
             IOobject::NO_WRITE
         ),
-        Sb.mesh(),
-        dimensionedScalar("kr"+Sb_.name()+"max",dimless,krBrooksAndCoreyCoeffs_.lookupOrDefault<scalar>("kr"+Sb_.name()+"max",1.0))
+        mesh,
+        dimensionedScalar(dimless, modelProperties_.lookupOrDefault<scalar>("kr"+Sname+"max"+porousRegion,1.0))
     ),
     krbmax_
     (
         IOobject
         (
-            "kr"+Sb_.name()+"max",
-            Sb_.time().timeName(),
-            Sb_.db(),
+            "kr"+Sname+"max"+porousRegion,
+            mesh.time().timeName(),
+            mesh,
             IOobject::READ_IF_PRESENT,
             IOobject::NO_WRITE
         ),
-        Sb.mesh(),
-        dimensionedScalar("kr"+Sb_.name()+"max",dimless,krBrooksAndCoreyCoeffs_.lookupOrDefault<scalar>("kr"+Sb_.name()+"max",1.0))
+        mesh,
+        dimensionedScalar(dimless, modelProperties_.lookupOrDefault<scalar>("kr"+Sname+"max"+porousRegion,1.0))
     )
 {
-    Se_ = (Sb_-Smin_)/(Smax_-Smin_);
     if (gMin(n_) <= 0)
     {
         FatalErrorIn
             (
                 "in krBrooksAndCorey.C"
             )
-            << "Relative permeability coefficient n equal or less than 0" 
+            << "Relative permeability coefficient n equal or less than 0"
+                << nl << "n" + porousRegion << " is required"
                 << exit(FatalError);
     }
- 
     Info << "Brooks and Corey parameters for relative permeability model" << nl << "{" << endl;
-    Info << "    n ";
-    if (n_.headerOk()) { Info << "read file" << endl;}
-    else {Info << average(n_).value() << endl;}
-    Info << "    Smax ";
-    if (Smax_.headerOk()) { Info << "read file" << endl;}
-    else {Info << average(Smax_).value() << endl;}
-    Info <<  "    Smin ";
+     Info <<  "    " << Sname << porousRegion << "min" << " ";
     if (Smin_.headerOk()) { Info << "read file" << endl;}
     else {Info << average(Smin_).value() << endl;}
-    Info << "    kramax ";
+    Info << "    " << Sname << porousRegion << "max" << " ";
+    if (Smax_.headerOk()) { Info << "read file" << endl;}
+    else {Info << average(Smax_).value() << endl;}
+   Info << "    n" << porousRegion << " ";
+    if (n_.headerOk()) { Info << "read file" << endl;}
+    else {Info << average(n_).value() << endl;}
+    Info << "    kramax" << porousRegion << " ";
     if (kramax_.headerOk()) { Info << "read file" << endl;}
     else {Info << average(kramax_).value() << endl;}
-    Info << "    krbmax ";
+    Info << "    krbmax" << porousRegion << " ";
     if (krbmax_.headerOk()) { Info << "read file" << endl;}
     else {Info << average(krbmax_).value() << endl;}
     Info << "} \n" << endl;

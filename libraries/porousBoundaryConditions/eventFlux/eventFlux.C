@@ -79,7 +79,7 @@ eventFlux
 {
     word eventFileName = dict.lookupOrDefault<word>("eventFile","");
     //- Read if backward time scheme is used
-    if (word(internalField().mesh().ddtScheme("source")) == "backward")
+    if (word(internalField().mesh().schemes().ddt("source")) == "backward")
     {
         isBackwardScheme_ = true;
     }
@@ -129,7 +129,7 @@ eventFlux
     }
 
     //- Read if backward time scheme is used
-    if (word(internalField().mesh().ddtScheme("source")) == "backward")
+    if (word(internalField().mesh().schemes().ddt("source")) == "backward")
     {
         isBackwardScheme_ = true;
     }

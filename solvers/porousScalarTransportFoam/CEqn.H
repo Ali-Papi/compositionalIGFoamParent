@@ -1,36 +1,22 @@
 //- update dispersion tensor coefficients and source terms
 forAll(patchEventList,patchEventi) patchEventList[patchEventi]->updateValue(runTime);
-forAll(sourceEventList,sourceEventi) sourceEventList[sourceEventi]->updateValue(runTime);
-composition.correct(U, Saturation, eps);
+forAll(tracerSourceEventList,tracerSourceEventi) tracerSourceEventList[tracerSourceEventi]->updateValue(runTime);
 
+//- Correct pmTransportModel + dispersion for classical porosity
+pmTransportModel->solveTransport(Utheta, phi, theta);
+
+//- display informations
 forAll(composition.Y(), speciesi)
 {
-    const auto& speciesName = composition.species()[speciesi];
-    
-    auto& C = composition.Y(speciesi);
-    const auto& R = composition.R(speciesi);
-    const auto& Deff = composition.Deff(speciesi);
-    const auto& lambda = composition.lambda(speciesi);
-    const auto& sourceTerm = composition.sourceTerm(speciesi);
+    const volScalarField& C = composition.Y(speciesi);
+    const word& speciesName = composition.species()[speciesi];
+    dtManagerC[speciesi].updateDerivatives();
 
-    fvScalarMatrix CEqn
-        (
-            eps * R * Saturation * fvm::ddt(C)
-            + fvm::div(phi, C, "div(phi,C)")
-            -  fvm::laplacian(eps * Saturation * Deff, C, "laplacian(Deff,C)")
-            ==
-            - sourceTerm
-            - eps * R * Saturation * fvm::Sp(lambda,C)
-        );
-
-    CEqn.solve("C");
-
-    dtManager[speciesi].updateDerivatives();
-
-    Info<< "Concentration: Min(" << speciesName << ") = " << gMin(C.internalField()) 
+    Info<< "Concentration: Min(" << speciesName << ") = " << gMin(C.internalField())
         << " Max(" << speciesName << ") = " << gMax(C.internalField())
-        << " mass(" << speciesName << ") = " << fvc::domainIntegrate(R*C*Saturation*eps).value()
-        << " dCmax = " << dtManager[speciesi].dVmax()*runTime.deltaTValue()
+        << " d" << speciesName << "dTmax = " << dtManagerC[speciesi].dVmax()
+        << " mass(" << speciesName << ") = " << fvc::domainIntegrate(C*theta).value()
+        << " dCmax = " << dtManagerC[speciesi].dVmax()*runTime.deltaTValue()
         << endl;
 
 }

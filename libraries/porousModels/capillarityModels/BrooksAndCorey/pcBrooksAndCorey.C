@@ -51,98 +51,70 @@ namespace Foam
 
 Foam::capillarityModels::pcBrooksAndCorey::pcBrooksAndCorey
 (
- const word& name,
- const dictionary& transportProperties,
- const volScalarField& Sb
- )
+    const fvMesh& mesh,
+    const dictionary& transportProperties,
+    const word& Sname,
+    const word porousRegion
+)
     :
-  capillarityModel(name, transportProperties,Sb),	
-  pcBrooksAndCoreyCoeffs_(transportProperties.subDict(typeName + "Coeffs")),
-  Smin_
-  (
-      IOobject
-      (
-          Sb_.name()+"min",
-          Sb_.time().timeName(),
-          Sb_.db(),
-          IOobject::READ_IF_PRESENT,
-          IOobject::NO_WRITE
-      ),
-      Sb.mesh(),
-      transportProperties.lookupOrDefault(Sb_.name()+"min",dimensionedScalar(Sb_.name()+"min",dimless,0))
-  ),
-  Smax_
-  (
-      IOobject
-      (
-          Sb_.name()+"max",
-          Sb_.time().timeName(),
-          Sb_.db(),
-          IOobject::READ_IF_PRESENT,
-          IOobject::NO_WRITE
-      ),
-      Sb.mesh(),
-      transportProperties.lookupOrDefault(Sb_.name()+"max",dimensionedScalar(Sb_.name()+"max",dimless,0))
-  ),
-  pc0_
-  (
-      IOobject
-      (
-          "pc0",
-          Sb_.time().timeName(),
-          Sb_.db(),
-          IOobject::READ_IF_PRESENT,
-          IOobject::NO_WRITE
-      ),
-      Sb.mesh(),
-      pcBrooksAndCoreyCoeffs_.lookupOrDefault("pc0",dimensionedScalar("pc0",dimensionSet(1,-1,-2,0,0),0))
-  ),
-  hd_
-  (
-      IOobject
-      (
-          "hd",
-          Sb_.time().timeName(),
-          Sb_.db(),
-          IOobject::READ_IF_PRESENT,
-          IOobject::NO_WRITE
-      ),
-      Sb.mesh(),
-      dimensionedScalar("hd",dimLength,pcBrooksAndCoreyCoeffs_.lookupOrDefault<scalar>("hd",0))
-  ),
-  alpha_
-  (
-      IOobject
-      (
-          "alpha",
-          Sb_.time().timeName(),
-          Sb_.db(),
-          IOobject::READ_IF_PRESENT,
-          IOobject::NO_WRITE
-      ),
-      Sb.mesh(),
-      dimensionedScalar("alpha",dimless,pcBrooksAndCoreyCoeffs_.lookupOrDefault<scalar>("alpha",0))
-  )
+    capillarityModel(mesh, transportProperties.subDict(typeName + "Coeffs"), Sname, porousRegion),
+    pc0_
+    (
+        IOobject
+        (
+            "pc0"+porousRegion,
+            mesh.time().timeName(),
+            mesh,
+            IOobject::READ_IF_PRESENT,
+            IOobject::NO_WRITE
+        ),
+        mesh,
+        dimensionedScalar(dimensionSet(1,-1,-2,0,0), capillarityProperties_.lookupOrDefault<scalar>("pc0"+porousRegion,0))
+    ),
+    hd_
+    (
+        IOobject
+        (
+            "hd"+porousRegion,
+            mesh.time().timeName(),
+            mesh,
+            IOobject::READ_IF_PRESENT,
+            IOobject::NO_WRITE
+        ),
+        mesh,
+        dimensionedScalar("hd",dimLength,capillarityProperties_.lookupOrDefault<scalar>("hd"+porousRegion,0))
+    ),
+    alpha_
+    (
+        IOobject
+        (
+            "alpha"+porousRegion,
+            mesh.time().timeName(),
+            mesh,
+            IOobject::READ_IF_PRESENT,
+            IOobject::NO_WRITE
+        ),
+        mesh,
+        dimensionedScalar("alpha",dimless,capillarityProperties_.lookupOrDefault<scalar>("alpha"+porousRegion,0))
+    )
 {
-    Se_ = ((Sb_-Smin_)/(Smax_-Smin_));
     if (gMin(alpha_) == 0) FatalErrorIn("Foam::capillarityModels::pcBrooksAndCorey::pcBrooksAndCorey") << "alpha = 0 in pcBrooksAndCorey" << abort(FatalError);
-
-    Info << "Brooks and Corey parameters for capillary pressure model" << nl << "{" << endl;
-    Info << "    pc0 ";
-    if (pc0_.headerOk()) { Info << "read file" << endl;}
-    else {Info << average(pc0_).value() << endl;}
-    Info << "    alpha ";
-    if (alpha_.headerOk()) { Info << "read file" << endl;}
-    else {Info << average(alpha_).value() << endl;}
-    Info << "    hd ";
-    if (hd_.headerOk()) { Info << "read file" << endl;}
-    else {Info << average(hd_).value() << endl;}
-    Info <<  "    Smin ";
+    Info << "Brooks and Corey parameters for capillarity pressure model" << nl << "{" << endl;
+    Info <<  "    " << Sname << porousRegion << "min" << " ";
     if (Smin_.headerOk()) { Info << "read file" << endl;}
     else {Info << average(Smin_).value() << endl;}
-    Info << "    Smax ";
+    Info << "    " << Sname << porousRegion << "max" << " ";
     if (Smax_.headerOk()) { Info << "read file" << endl;}
     else {Info << average(Smax_).value() << endl;}
+    Info << "    pc0" << porousRegion << " ";
+    if (pc0_.headerOk()) { Info << "read file" << endl;}
+    else {Info << average(pc0_).value() << endl;}
+    Info << "    alpha" << porousRegion << " ";
+    if (alpha_.headerOk()) { Info << "read file" << endl;}
+    else {Info << average(alpha_).value() << endl;}
+    Info << "    hd" << porousRegion << " ";
+    if (hd_.headerOk()) { Info << "read file" << endl;}
+    else {Info << average(hd_).value() << endl;}
     Info << "} \n" << endl;
 
 }

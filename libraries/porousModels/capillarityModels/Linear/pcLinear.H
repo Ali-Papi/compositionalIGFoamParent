@@ -29,7 +29,7 @@ Class
     Foam::capillarityModels::linear
 
 Description
-    Standard linear model for capillary pressure
+    Standard linear model for capillarity pressure
 
 SourceFiles
     pcLinear.C
@@ -59,10 +59,6 @@ class pcLinear
     public capillarityModel
 {
     // pcVan Genuchten coefficients
-    dictionary pcLinearCoeffs_;
-
-    volScalarField Smin_;
-    volScalarField Smax_;
     volScalarField pc0_;
     volScalarField pcMax_;
 
@@ -76,9 +72,10 @@ public:
     //- Construct from components
     pcLinear
     (
-        const word& name,
+        const fvMesh& mesh,
         const dictionary& transportProperties,
-        const volScalarField& Sb
+        const word& Sname,
+        const word porousRegion = ""
     );
 
     //- Destructor
@@ -88,29 +85,36 @@ public:
     // Member Functions
 
     //- Correct the capillarity
-    void correct()
+    void correct(const volScalarField& Sb)
         {
-            Se_ = (Sb_- Smin_)/(Smax_-Smin_);
+            Se_ = (Sb - Smin_)/(Smax_-Smin_);
             pc_ = pc0_ + (1 - Se_) * (pcMax_ - pc0_);
             dpcdS_ =  pc0_ - pcMax_;
         }
 
-    //- Compute capillary capacity from head pressure and return moisture (Richards' model)
-    volScalarField correctAndSb(volScalarField h)
+    //- Compute capillarity capacity from head pressure and return moisture (Richards' model)
+    tmp<volScalarField> correctAndSb(volScalarField& h)
         {
             FatalErrorIn("volScalarField correctAndSb(volScalarField h) const")
                 << "Not implemented in pcLinear.H " << abort(FatalError);
-            return Se_;
+            return tmp<volScalarField>();
         };
 
-    //- Compute capillary capacity from head pressure and return moisture (Richards' model)
-    scalar correctAndSb(const volScalarField& h, const label& celli)
+    //- Compute capillarity capacity from head pressure and return moisture (Richards' model)
+    scalar correctAndSb(volScalarField& h, const label& celli)
         {
-            FatalErrorIn("scalar correctOneCell(const volScalarField& h, const label& celli)")
+            FatalErrorIn("scalar correctAndSb(const volScalarField& h, const label& celli)")
                 << "Not implemented in pcLinear.H " << abort(FatalError);
             return 0;
         };
 
+    //- Compute saturation from given head pressure
+    tmp<volScalarField> S(volScalarField& h)
+        {
+            FatalErrorIn("tmp<volScalarField> S(const volScalarField& h)")
+                << "Not implemented in pcLinear.H " << abort(FatalError);
+            return  tmp<volScalarField>();
+        }
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

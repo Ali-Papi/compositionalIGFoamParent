@@ -1,5 +1,5 @@
 //- relative permeability (kr)
-krModel->correct();
+krModel->correct(Sb);
 const volScalarField& kra = krModel->kra();
 const volScalarField& krb = krModel->krb();
 const volScalarField& dkradS = krModel->dkradS();
@@ -21,8 +21,8 @@ surfaceScalarField Fbf ("Fbf",(krbf/mub) / ((kraf/mua) + (krbf/mub)));
 volScalarField Fb ("Fb",(krb/mub) / ( (kra/mua) + (krb/mub) ));
 
 //- capillarity computation (pc)
-pcModel().correct();
-surfaceVectorField gradpc("gradpc",fvc::interpolate(pcModel().dpcdS()*fvc::grad(Sb),"pc"));
+pcModel->correct(Sb);
+surfaceVectorField gradpc("gradpc",fvc::interpolate(pcModel->dpcdS()*fvc::grad(Sb),"pc"));
 
 //- fluxes depending on saturation
 surfaceScalarField phiG("phiG",(Lf & g) & mesh.Sf());

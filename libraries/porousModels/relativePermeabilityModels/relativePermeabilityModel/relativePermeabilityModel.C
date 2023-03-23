@@ -42,77 +42,105 @@ defineRunTimeSelectionTable(relativePermeabilityModel, dictionary);
 
 Foam::relativePermeabilityModel::relativePermeabilityModel
 (
-    const word& name,
-    const dictionary& transportProperties,
-    const volScalarField& Sb
+    const fvMesh& mesh,
+    const dictionary& modelProperties,
+    const word& Sname,
+    const word porousRegion
 )
     :
-    name_(name),
-    transportProperties_(transportProperties),
-    Sb_(Sb),
+    Sname_(Sname),
+    modelProperties_(modelProperties),
     kra_
     (
         IOobject
         (
-            name+".kra",
-            Sb_.time().timeName(),
-            Sb_.db(),
+            Sname+porousRegion+".kra",
+            mesh.time().timeName(),
+            mesh,
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
-        Sb.mesh(),
+        mesh,
+
         dimensionSet(0,0,0,0,0)
     ),
     krb_
     (
         IOobject
         (
-            name+".krb",
-            Sb_.time().timeName(),
-            Sb_.db(),
+            Sname+porousRegion+".krb",
+            mesh.time().timeName(),
+            mesh,
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
-        Sb.mesh(),
+        mesh,
         dimensionSet(0,0,0,0,0)
     ),
     dkradS_
     (
         IOobject
         (
-            name+".dkradS",
-            Sb_.time().timeName(),
-            Sb_.db(),
+            Sname+porousRegion+".dkradS",
+            mesh.time().timeName(),
+            mesh,
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
-        Sb.mesh(),
+        mesh,
         dimensionSet(0,0,0,0,0)
     ),
     dkrbdS_
     (
         IOobject
         (
-            name+".dkrbdS",
-            Sb_.time().timeName(),
-            Sb_.db(),
+            Sname+porousRegion+".dkrbdS",
+            mesh.time().timeName(),
+            mesh,
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
-        Sb.mesh(),
+        mesh,
         dimensionSet(0,0,0,0,0)
+    ),
+    Smin_
+    (
+      IOobject
+      (
+          Sname+porousRegion+"min",
+          mesh.time().timeName(),
+          mesh,
+          IOobject::READ_IF_PRESENT,
+          IOobject::NO_WRITE
+      ),
+      mesh,
+      dimensionedScalar(dimless, modelProperties.lookupOrDefault<scalar>(Sname+porousRegion+"min", 0))
+    ),
+    Smax_
+    (
+        IOobject
+        (
+            Sname+porousRegion+"max",
+            mesh.time().timeName(),
+            mesh,
+            IOobject::READ_IF_PRESENT,
+            IOobject::NO_WRITE
+        ),
+        mesh,
+        dimensionedScalar(dimless, modelProperties.lookupOrDefault<scalar>(Sname+porousRegion+"max", 1))
     ),
     Se_
     (
         IOobject
         (
-            name+".Se",
-            Sb.time().timeName(),
-            Sb.db(),
+            Sname+porousRegion+".Se",
+            mesh.time().timeName(),
+            mesh,
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
-        Sb,
+        mesh,
+        dimensionedScalar("", dimless, 0),
         calculatedFvPatchScalarField::typeName
     )
 {}

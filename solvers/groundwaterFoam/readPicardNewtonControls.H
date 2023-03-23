@@ -33,10 +33,10 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
-const dictionary& PicardDict = mesh.solutionDict().subOrEmptyDict("Picard");
+const dictionary& PicardDict = mesh.solution().subOrEmptyDict("Picard");
 const scalar tolerancePicard = PicardDict.lookupOrDefault<scalar>("tolerance", GREAT);
-const label maxIterPicard = PicardDict.lookupOrDefault<label>("maxIter",10);
-const dictionary& NewtonDict = mesh.solutionDict().subOrEmptyDict("Newton");
+label maxIterPicard = PicardDict.lookupOrDefault<label>("maxIter",10);
+const dictionary& NewtonDict = mesh.solution().subOrEmptyDict("Newton");
 const scalar toleranceNewton = NewtonDict.lookupOrDefault<scalar>("tolerance", GREAT);
 const label maxIterNewton = NewtonDict.lookupOrDefault<label>("maxIter",10);
 
@@ -47,7 +47,7 @@ Info << nl << "Picard loop control" << nl << "{"
 Info << nl << "Newton loop control" << nl << "{"
 << nl << "    tolerance = " << toleranceNewton
 << "    maximum number of iteration = " << maxIterNewton
-<< nl << "}" << nl << endl;
+<< nl << "}" << endl;
 
 if (!PicardDict.found("tolerance") && !NewtonDict.found("tolerance"))
 {
@@ -58,5 +58,3 @@ if (!PicardDict.found("tolerance") && !NewtonDict.found("tolerance"))
 
 //- to switch between conservative mixed formulation (by default) and head pressure (non conservative)
 bool massConservative = transportProperties.lookupOrDefault<bool>("massConservative",true);
-scalar massConservativeTerms = 0;
-if (massConservative) massConservativeTerms = 1;

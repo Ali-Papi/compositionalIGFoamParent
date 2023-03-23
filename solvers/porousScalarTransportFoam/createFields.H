@@ -15,46 +15,27 @@ IOdictionary transportProperties
     )
 );
 
-Info<< "Reading porosity field eps (if present)" << endl;
-dimensionedScalar epsScalar(transportProperties.lookupOrDefault("eps",dimensionedScalar("",dimless,0.)));
-volScalarField eps
-(
-    IOobject
-    (
-        "eps",
-        runTime.constant(),
-        mesh,
-        IOobject::READ_IF_PRESENT,
-        IOobject::NO_WRITE
-    ),
-    mesh,
-    epsScalar
-);
+///////////////////////////////////////////////////////////////////
+///////////////////// VELOCITY - FLUXES ///////////////////////////
+///////////////////////////////////////////////////////////////////
+
+Info << nl << "Creating fluidPhase" << endl;
+word phaseName(transportProperties.optionalSubDict("porousTransport").lookupOrDefault<word>("phaseName",""));
+autoPtr<fluidPhase> phase = fluidPhase::New(mesh, transportProperties, phaseName);
+volVectorField& Utheta = phase->U();
+surfaceScalarField& phi = phase->phi();
 
 //- list that receives event files for active event-based boundary conditions
 List<patchEventFile*> patchEventList;
 eventFlux::setEventFileRegistry(&patchEventList, "C");
 
-List<sourceEventFile*> sourceEventList;
+porousMediumModel pmModel(mesh, transportProperties, "");
+pmModel.check_eps();
+const volScalarField& eps = pmModel.eps();
+autoPtr<porousMediumTransportModel> pmTransportModel = porousMediumTransportModel::New(phaseName, pmModel);
+multiscalarMixture& composition = pmTransportModel->composition();
+List<sourceEventFile*>& tracerSourceEventList = pmTransportModel->sourceEventList();
 
-wordList speciesNames(transportProperties.lookupOrDefault("species", wordList(1, "C")));
-
-Info<< "Reading composition\n" << endl;
-
-multiscalarMixture composition
-(
-    transportProperties,
-    speciesNames,
-    mesh,
-    word::null,
-    eps,
-    &sourceEventList,
-    "C"
-);
-
-
-Info<< "Reading phaseName" << endl;
-word phaseName(transportProperties.optionalSubDict("porousTransport").lookupOrDefault<word>("phaseName",""));
 
 ///////////////////////////////////////////////////////////////////
 ////////////////////// POTENTIAL-SATURATION ///////////////////////
@@ -92,62 +73,20 @@ volScalarField Saturation
 word Uname="U"+phaseName;
 if (theta.headerOk())
 {
-    Saturation = theta/eps;
-    Uname = "U";
     Info << "===> field S" << phaseName << " computed from theta/eps, min = " << gMin(Saturation.internalField()) << " ; max = " << gMax(Saturation.internalField()) << endl;
 }
 else
 {
     if (Saturation.headerOk())
     {
+        theta = Saturation * eps;
         Info << "===> field S" << phaseName << " read, min = " << gMin(Saturation.internalField()) << " ; max = " << gMax(Saturation.internalField()) <<  endl;
     }
     else
     {
-        Info << "===> Saturation file not found (saturated flow)" << endl;
+        Info << "===> Saturation/Water content file not found (saturated flow)" << endl;
     }
 }
-
-/////////////////////////////////////////////////////////////////////////////
-////////////////////////// VELOCITY - FLUXES ////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
-
-Info<< nl << "Reading field U" << phaseName << endl;
-volVectorField U
-(
-    IOobject
-    (
-        Uname,
-        runTime.timeName(),
-        mesh,
-        IOobject::MUST_READ,
-        IOobject::NO_WRITE
-    ),
-    mesh
-);
-
-surfaceScalarField phi
-(
-    IOobject
-    (
-        "phi"+phaseName,
-        runTime.timeName(),
-        mesh,
-        IOobject::READ_IF_PRESENT,
-        IOobject::NO_WRITE
-    ),
-    fvc::flux(U)
-);
-
-if (phi.headerOk())
-{
-    Info << nl << "Reading field phi" << phaseName << endl;
-}
-else
-{
-    Info<< nl << "Computing field phi" << phaseName << " from field U" << phaseName << endl;
-}
-
 
 ////////////////////////////////////////////////////
 //////////////////// OUTPUT CSV ////////////////////

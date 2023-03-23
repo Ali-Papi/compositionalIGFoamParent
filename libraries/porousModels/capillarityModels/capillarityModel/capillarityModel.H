@@ -63,17 +63,17 @@ class capillarityModel
 protected:
 
     // Protected data
-    word name_;
-    dictionary capillarityProperties_;
+    //- name of the saturation field
+    word Sname_;
 
-    // reference to the saturation field 
-    const volScalarField& Sb_;
+    // Reference to the dictionary
+    const dictionary& capillarityProperties_;
 
     // capillary pressure, derivative and capillary capacity
     volScalarField pc_,dpcdS_,Ch_;
 
     // Effective saturation field
-    volScalarField Se_;
+    volScalarField Smin_, Smax_, Se_;
 
     // Private Member Functions
 
@@ -96,11 +96,12 @@ public:
         capillarityModel,
         dictionary,
         (
-            const word& name,
+            const fvMesh& mesh,
             const dictionary& capillarityProperties,
-            const volScalarField& Sb
+            const word& Sname,
+            const word porousRegion
         ),
-        (name, capillarityProperties, Sb)
+        (mesh, capillarityProperties, Sname, porousRegion)
     );
 
 
@@ -109,9 +110,10 @@ public:
     //- Return a reference to the selected capillarity model
     static autoPtr<capillarityModel> New
     (
-        const word& name,
+        const fvMesh& mesh,
         const dictionary& capillarityProperties,
-        const volScalarField& Sb
+        const word& Sname,
+        const word porousRegion = ""
     );
 
 
@@ -120,9 +122,10 @@ public:
     //- Construct from components
     capillarityModel
     (
-        const word& name,
+        const fvMesh& mesh,
         const dictionary& capillarityProperties,
-        const volScalarField& Sb
+        const word& Sname,
+        const word porousRegion = ""
     );
 
 
@@ -132,55 +135,41 @@ public:
 
     // Member Functions
 
+    //- Return the name of the saturation field
+    const word& Sname() {return Sname_;}
+    
     //- Return the phase transport properties dictionary
-    const dictionary& capillarityProperties() const
-        {
-            return capillarityProperties_;
-        }
+    const dictionary& capillarityProperties() const{return capillarityProperties_;}
       
     //- Return the capillary pressure as a function of Sb 
-    tmp<volScalarField> pc() const
-        {
-            return pc_;
-        }
+    const volScalarField& pc() const {return pc_;}
 
     //- Return the derivative of capillary pressure as a function of Sb
-    tmp<volScalarField> dpcdS() const
-        {
-            return dpcdS_;
-        }
+    const volScalarField& dpcdS() const {return dpcdS_;}
 
-    //- Return effective saturation
-    tmp<volScalarField> Se() const
-        {
-            return Se_;
-        }
+    //- Return min/max/effective saturation
+    const volScalarField& Smin() const {return Smin_;}
+    const volScalarField& Smax() const {return Smax_;}
+    const volScalarField& Se() const {return Se_;}
 
     //- Capillary capacity (Richards' model)
-    tmp<volScalarField> Ch() const
-        {
-            return Ch_;
-        };
+    const volScalarField& Ch() const {return Ch_;}
 
     //- Capillary capacity (one cell)
-    const scalar& Ch(const label& celli) const
-        {
-            return Ch_[celli];
-        }
+    const scalar& Ch(const label& celli) const {return Ch_[celli];}
 
     //- To set specific value of Ch
-    void setCh(const label& celli, const scalar& ChValue)
-        {
-            Ch_[celli] = ChValue;
-        }
-    
+    void setCh(const label& celli, const scalar& ChValue) {Ch_[celli] = ChValue;}
+
     //- Correct the capillary pressure
-    virtual void correct() = 0; 
+    virtual void correct(const volScalarField& Sb) = 0;
 
     //- Compute capillary capacity from head pressure and return moisture (Richards' model)
-    virtual volScalarField correctAndSb(volScalarField h) = 0;
-    virtual scalar correctAndSb(const volScalarField& h, const label& celli) = 0;
+    virtual tmp<volScalarField> correctAndSb(volScalarField& h) = 0;
+    virtual scalar correctAndSb(volScalarField& h, const label& celli) = 0;
 
+    //- Compute saturation for given head pressure
+    virtual tmp<volScalarField> S(volScalarField& h) = 0;
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -73,14 +73,6 @@ volScalarField theta
 );
 theta.dimensions().reset(dimless);
 
-// Relative permeability / Capillary pressure models
-autoPtr<relativePermeabilityModel> krModel = relativePermeabilityModel::New("krModel",transportProperties,theta);
-autoPtr<capillarityModel> pcModel = capillarityModel::New("pcModel",transportProperties,theta);
-
-Info << nl << "Computing saturation field theta" << endl;
-theta = pcModel->correctAndSb(h);
-theta.write();
-
 ////////////////////////////////////////////////////////////////////
 /////////////////////////// PHASE MODEL ////////////////////////////
 ////////////////////////////////////////////////////////////////////
@@ -104,28 +96,22 @@ surfaceScalarField phi
     linearInterpolate(Utheta) & mesh.Sf()
 );
 
+// Relative permeability / Capillary pressure models
+autoPtr<twophasePorousMediumModel> porousModel = twophasePorousMediumModel::New("theta", mesh, transportProperties, phasetheta);
+autoPtr<relativePermeabilityModel>& krModel = porousModel->krModel();
+autoPtr<capillarityModel>& pcModel = porousModel->pcModel();
+
+Info << nl << "Computing saturation field theta" << endl;
+theta = pcModel->correctAndSb(h);
+theta.write();
+
 /////////////////////////////////////////////////////////////////////////////
 ////////////////////////// POROUS MEDIA PROPERTIES //////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 
 // Intrinsic permeability
-Info  << nl << "Reading permeability field K" << endl;
-volScalarField K
-(
-    IOobject
-    (
-        "K",
-        runTime.constant(),
-        mesh,
-        IOobject::MUST_READ,
-        IOobject::AUTO_WRITE
-    ),
-    mesh
-);
-
-scalar Kfactor(transportProperties.lookupOrDefault<scalar>("Kfactor",1));
-K *= Kfactor;
-Info  << nl << "Reading permeability field factor : Kfactor = " << Kfactor << endl;
+porousModel->check_K();
+const volScalarField& K = porousModel->K();
 
 // permeability interpolation
 surfaceScalarField Kf(fvc::interpolate(K,"K"));
@@ -134,24 +120,8 @@ surfaceScalarField Kf(fvc::interpolate(K,"K"));
 dimensionedScalar Ss(transportProperties.lookupOrDefault<dimensionedScalar>("Ss",dimensionedScalar("Ss",dimless/dimLength,0.)));
 Info << nl << "Reading speficic storage : Ss = " << Ss.value() << endl;
 
-///////////////////////////////////////////////////////////////////
-////////////////////////// FORCING TERMS //////////////////////////
-///////////////////////////////////////////////////////////////////
-
 //- For constant or event source injection/extraction
-volScalarField sourceTerm
-(
-    IOobject
-    (
-        "sourceTerm",
-        runTime.timeName(),
-        mesh,
-        IOobject::READ_IF_PRESENT,
-        IOobject::NO_WRITE
-    ),
-    mesh,
-    dimensionedScalar("",dimless/dimTime,0)
-);
+volScalarField& sourceTerm = porousModel->sourceTerm();
 
 ////////////////////////////////////////////////////
 //////////////////// OUTPUT CSV ////////////////////
@@ -171,3 +141,5 @@ if (CSVoutput)
     }
     waterMassBalanceCSV << endl;
 }
+
+bool writeResiduals=runTime.controlDict().lookupOrDefault<bool>("writeResiduals",false);

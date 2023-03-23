@@ -51,23 +51,24 @@ using namespace Foam;
 int main(int argc, char *argv[])
 {
     #include "setRootCase.H"
+    #include "../headerPMF.H"
     #include "createTime.H"
     #include "createMesh.H"
     #include "createFields.H"
     #include "readFixedPoints.H"
     #include "readTimeControls.H"  
     #include "readEvent.H"
-
+    bool steady = false;
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
     Info << "\nStarting time loop\n" << endl;
 
     while (runTime.run())
     {
-        if (infiltrationEventIsPresent) infiltrationEvent.updateIndex(runTime.timeOutputValue());
-        if (waterSourceEventIsPresent) waterSourceEvent.updateIndex(runTime.timeOutputValue());
-        forAll(sourceEventList,sourceEventi) sourceEventList[sourceEventi]->updateIndex(runTime.timeOutputValue());
-        forAll(patchEventList,patchEventi) patchEventList[patchEventi]->updateIndex(runTime.timeOutputValue());
+        if (infiltrationEventIsPresent) infiltrationEvent.updateIndex(runTime.userTimeValue());
+        if (waterSourceEventIsPresent) waterSourceEvent.updateIndex(runTime.userTimeValue());
+        forAll(sourceEventList,sourceEventi) sourceEventList[sourceEventi]->updateIndex(runTime.userTimeValue());
+        forAll(patchEventList,patchEventi) patchEventList[patchEventi]->updateIndex(runTime.userTimeValue());
         #include "setDeltaT.H"
 
         runTime++;
@@ -97,7 +98,7 @@ int main(int argc, char *argv[])
             << nl << endl;
     }
 
-    if (cumulativeWaterAdded > 0) Info << "Cumulated water added = " << cumulativeWaterAdded << " m3, equivalent height = " << cumulativeWaterAdded*zScale/sum(mesh.V()).value() << " m" << nl << endl;
+    if (cumulativeWaterAdded > 0) Info << "Cumulated water added = " << cumulativeWaterAdded << " m3, equivalent height = " << cumulativeWaterAdded*zScale/gSum(mesh.V()) << " m" << nl << endl;
     Info<< "End\n" << endl;
 
     return 0;

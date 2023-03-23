@@ -1,7 +1,7 @@
 //- write using event file
 if (outputEventIsPresent)
 {
-    if (outputEvent.currentEventEndTime() <= runTime.timeOutputValue())
+    if (outputEvent.currentEventEndTime() <= runTime.userTimeValue())
     {
         //- compute and write time interpolated fields
         volScalarField h_interpolated = outputEvent.timeInterpolate(h, runTime);
@@ -17,7 +17,7 @@ if (outputEventIsPresent)
             {
                 if (mesh.boundaryMesh()[patchi].type() == "patch")
                 {
-                    waterMassBalanceCSV << " " << sum(phi_interpolated.boundaryField()[patchi]);
+                    waterMassBalanceCSV << " " << gSum(phi_interpolated.boundaryField()[patchi]);
                 }
             }
             waterMassBalanceCSV << endl;
@@ -41,14 +41,14 @@ if (outputEventIsPresent)
                 {
                     if (mesh.boundaryMesh()[patchi].type() == "patch")
                     {
-                        CmassBalanceCSV << " " << sum(phi_interpolated.boundaryField()[patchi]*C_interpolated.boundaryField()[patchi]);
+                        CmassBalanceCSV << " " << gSum(phi_interpolated.boundaryField()[patchi]*C_interpolated.boundaryField()[patchi]);
                     }
                 }
                 CmassBalanceCSV << endl;
             }
         }
 
-        outputEvent.updateIndex(runTime.timeOutputValue());
+        outputEvent.updateIndex(runTime.userTimeValue());
     }
 }
 else
@@ -64,7 +64,7 @@ else
             {
                 if (mesh.boundaryMesh()[patchi].type() == "patch")
                 {
-                    waterMassBalanceCSV << " " << sum(phi.boundaryField()[patchi]);
+                    waterMassBalanceCSV << " " << gSum(phi.boundaryField()[patchi]);
                 }
             }
             waterMassBalanceCSV << endl;
@@ -80,7 +80,7 @@ else
                 {
                     if (mesh.boundaryMesh()[patchi].type() == "patch")
                     {
-                        CmassBalanceCSV << " " << sum(phi.boundaryField()[patchi]*C.boundaryField()[patchi]);
+                        CmassBalanceCSV << " " << gSum(phi.boundaryField()[patchi]*C.boundaryField()[patchi]);
                     }
                 }
                 CmassBalanceCSV << endl;

@@ -29,7 +29,7 @@ Class
     Foam::capillarityModels::Ippisch
 
 Description
-    Ippisch-Vogel-Bastian capillary pressure model (AWR 2006)
+    Ippisch-Vogel-Bastian capillarity pressure model (AWR 2006)
 
 SourceFiles
     pcIppisch.C
@@ -57,8 +57,6 @@ class pcIppisch
     public capillarityModel
 {
     //- Ippisch coefficients
-    dictionary pcIppischCoeffs_;
-    volScalarField Smin_,Smax_;
     volScalarField m_,n_,alpha_,tau_,he_;
 
     //- cut-off point saturation (computed with entry pressure)
@@ -74,9 +72,10 @@ public:
     //- Construct from components
     pcIppisch
     (
-        const word& name,
+        const fvMesh& mesh,
         const dictionary& transportProperties,
-        const volScalarField& Sb
+        const word& Sname,
+        const word porousRegion = ""
     );
 
     //- Destructor
@@ -85,45 +84,53 @@ public:
 
     // Member Functions
 
-    //- Correct the capillary pressure
-    void correct()
+    //- Correct the capillarity pressure
+    void correct(const volScalarField& Sb)
         {
             FatalErrorIn("void correct()")
                 << "Not implemented in pcIppish.H " << abort(FatalError);
         }
 
-    //- Compute capillary capacity from head pressure and return moisture (Richards' model)
-    volScalarField correctAndSb(volScalarField h)
+    //- Compute capillarity capacity from head pressure and return moisture (Richards' model)
+    tmp<volScalarField> correctAndSb(volScalarField& h)
         {
             //- Compute Saturation from head pressure
             h.dimensions().reset(dimless);
             Se_ = neg(h+he_) *(1/Sc_)*pow(1.0+pow(alpha_*mag(h),n_),-m_) + pos(h+he_+VSMALL) ;
             h.dimensions().reset(dimLength);
 
-            //- Update capillary capacity
+            //- Update capillarity capacity
             Ch_.dimensions().reset(dimless);
             Ch_ = alpha_*m_*(Smax_-Smin_)/(1.0-m_)*pow(Se_,1.0/m_)*pow(1.0-pow(Se_,1.0/m_),m_) ;
             Ch_.dimensions().reset(dimless/dimLength);
 
-            //- Update saturation
-            volScalarField Stmp_(Smin_+(Smax_-Smin_)*Se_);
-    
-            return Stmp_;
+            //- Compute saturation
+            return Smin_+(Smax_-Smin_)*Se_;
         }
 
-    //- Compute capillary capacity from head pressure and return moisture (Richards' model)
-    scalar correctAndSb(const volScalarField& h, const label& celli)
+    //- Compute capillarity capacity from head pressure and return moisture (Richards' model)
+    scalar correctAndSb(volScalarField& h, const label& celli)
         {
             //- Compute saturation from head pressure
             scalar Se = neg(h[celli]+he_[celli]) *(1.0/Sc_[celli])*pow(1.0+pow(alpha_[celli]*mag(h[celli]),n_[celli]),-m_[celli]) + pos(h[celli]+he_[celli]+VSMALL) ;
 
-            //- Update capillary capacity
+            //- Update capillarity capacity
             Ch_[celli] = alpha_[celli]*m_[celli]*(Smax_[celli]-Smin_[celli])/(1.0-m_[celli])*pow(Se,1.0/m_[celli])*pow(1.0-pow(Se,1.0/m_[celli]),m_[celli]) ;
 
             //- Update saturation
             return Smin_[celli]+(Smax_[celli]-Smin_[celli])*Se;
         }
 
+    //- Compute saturation from given head pressure
+    tmp<volScalarField> S(volScalarField& h)
+        {
+            //- Compute Saturation from head pressure
+            h.dimensions().reset(dimless);
+            tmp<volScalarField> Se = neg(h+he_) *(1/Sc_)*pow(1.0+pow(alpha_*mag(h),n_),-m_) + pos(h+he_+VSMALL) ;
+            h.dimensions().reset(dimLength);
+            //- Return saturation
+            return Smin_+(Smax_-Smin_)*Se;
+        }
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

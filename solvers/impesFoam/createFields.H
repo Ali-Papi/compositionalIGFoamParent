@@ -94,46 +94,23 @@ const dimensionedScalar& mub = phaseb->mu();
 
 dimensionedScalar Mmu(mub/mua);//viscosity ratio
 
-// Relative permeability / Capillary pressure models 
-autoPtr<relativePermeabilityModel> krModel = relativePermeabilityModel::New("krModel",transportProperties,Sb);
-scalar activateCapillarity(transportProperties.lookupOrDefault<scalar>("activateCapillarity",0.));
-autoPtr<capillarityModel> pcModel = capillarityModel::New("pcModel",transportProperties,Sb);
-
 /////////////////////////////////////////////////////////////////////////////
 ////////////////////////// POROUS MEDIA PROPERTIES //////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 
-// Porosity
-Info << nl << "Reading porosity field eps" << endl;
-dimensionedScalar epsScalar(transportProperties.lookupOrDefault("eps",dimensionedScalar("",dimless,0.)));
-volScalarField eps
-(
-    IOobject
-    (
-        "eps",
-        runTime.constant(),
-        mesh,
-        IOobject::READ_IF_PRESENT,
-        IOobject::NO_WRITE
-    ),
-    mesh,
-    epsScalar
-);
+// Relative permeability / Capillary pressure models 
+autoPtr<twophasePorousMediumModel> porousModel = twophasePorousMediumModel::New("Sb", mesh, transportProperties, phaseb);
+autoPtr<relativePermeabilityModel>& krModel = porousModel->krModel();
+autoPtr<capillarityModel>& pcModel = porousModel->pcModel();
+scalar activateCapillarity(transportProperties.lookupOrDefault<scalar>("activateCapillarity",0.));
 
-// Intrinsic permeability       
-Info << nl << "Reading permeability field K" << endl;
-volScalarField K
-(
-    IOobject
-    (
-        "K",
-        runTime.constant(),
-        mesh,
-        IOobject::MUST_READ,
-        IOobject::AUTO_WRITE
-    ),
-    mesh
-);
+// Porosity
+porousModel->check_eps();
+const volScalarField& eps = porousModel->eps();
+
+// Intrinsic permeability
+porousModel->check_K();
+const volScalarField& K = porousModel->K();
 
 // permeability interpolation
 surfaceScalarField Kf(fvc::interpolate(K,"K"));

@@ -50,17 +50,12 @@ namespace relativePermeabilityModels
 
 /*---------------------------------------------------------------------------*\
     Class krBrooksAndCorey Declaration
-    \*---------------------------------------------------------------------------*/
+\*---------------------------------------------------------------------------*/
 
 class krBrooksAndCorey
 :
     public relativePermeabilityModel
 {
-    //- Private data
-    volScalarField Smin_;
-    volScalarField Smax_;
-
-    dictionary krBrooksAndCoreyCoeffs_;
     volScalarField n_;
 
     //- end points
@@ -77,9 +72,10 @@ public:
     //- Construct from components
     krBrooksAndCorey
     (
-        const word& name,
+        const fvMesh& mesh,
         const dictionary& transportProperties,
-        const volScalarField& Sb
+        const word& Sname,
+        const word porousRegion = ""
     );
 
     //- Destructor
@@ -89,30 +85,35 @@ public:
     // Member Functions
 
     //- Correct the relative permeabilities
-    void correct()
+    void correct(const volScalarField& Sb)
         {
-            Se_= (Sb_-Smin_)/(Smax_-Smin_);
+            Se_= (Sb-Smin_)/(Smax_-Smin_);
             kra_ = kramax_* pow((scalar(1)-Se_),n_);
             krb_ = krbmax_ * pow(Se_,n_);
             dkradS_ = -kramax_*n_*pow((scalar(1)-Se_),n_-1)/(Smax_- Smin_);
             dkrbdS_ = krbmax_*n_*pow(Se_,n_-1)/(Smax_- Smin_);	
         }
-    void correcta()
+    void correctkra(const volScalarField& Sb)
         {
-            Se_= (Sb_-Smin_)/(Smax_-Smin_);
+            Se_= (Sb-Smin_)/(Smax_-Smin_);
             kra_ = kramax_* pow((scalar(1)-Se_),n_);
             dkradS_ = -kramax_*n_*pow((scalar(1)-Se_),n_-1)/(Smax_- Smin_);
         }
-    void correctb()
+    void correctkrb(const volScalarField& Sb)
         {
-            Se_= (Sb_-Smin_)/(Smax_-Smin_);
+            Se_= (Sb-Smin_)/(Smax_-Smin_);
             krb_ = krbmax_ * pow(Se_,n_);
             dkradS_ = -kramax_*n_*pow((scalar(1)-Se_),n_-1)/(Smax_- Smin_);
         }
-    void correctb(const label& celli)
+    void correctkrb(const volScalarField& Sb, const label& celli)
         {
-            scalar Se = (Sb_[celli]-Smin_[celli])/(Smax_[celli]-Smin_[celli]);
+            scalar Se = (Sb[celli]-Smin_[celli])/(Smax_[celli]-Smin_[celli]);
             krb_[celli] = krbmax_[celli] * pow(Se,n_[celli]);
+        }
+    tmp<volScalarField> kr(const volScalarField& S)
+        {
+            volScalarField Se= (S-Smin_)/(Smax_-Smin_);
+            return krbmax_ * pow(Se,n_);
         }
 };
 

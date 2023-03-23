@@ -44,10 +44,6 @@ edges
 
 boundary
 (
-
-
-
-
     top
     {
         type patch;

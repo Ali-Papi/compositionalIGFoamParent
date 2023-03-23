@@ -31,20 +31,19 @@ License
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-template<typename EpsType>
 inline Foam::multiscalarMixture::multiscalarMixture
 (
     const dictionary& dict,
     const wordList& speciesNames,
     const fvMesh& mesh,
     const word& phaseName,
-    const EpsType& eps,
+    const volScalarField& eps,
     List<sourceEventFile*>* sourceEventFileRegistry,
     const word& sourceEventDtFieldNameOverride,
-    const dimensionSet& sourceTermDimFactor
+    const dimensionSet& sourceTermDimFactor,
+    const word& porousRegion
 )
 :
-    basicMixture(dict, mesh, phaseName),
     species_(speciesNames),
     Y_(species_.size()),
     R_(speciesNames.size()),
@@ -54,44 +53,36 @@ inline Foam::multiscalarMixture::multiscalarMixture
     sourceTerms_(speciesNames.size()),
     Kd_(speciesNames.size()),
     rs_(speciesNames.size()),
-    epsTotal_(speciesNames.size())
+    epsTotal_(speciesNames.size()),
+    eps_(eps)
 {
     forAll(speciesNames, speciesi)
     {
 
-        Info<< "Species " << speciesNames[speciesi] << endl;
+        Info<< nl << "******** Specie " << speciesNames[speciesi] << porousRegion << " ********" << endl;
 
-        Y_.set
-        (
-            speciesi,
-            new volScalarField
-            (
-                IOobject
-                (
-                    IOobject::groupName(species_[speciesi], phaseName),
-                    mesh.time().timeName(),
-                    mesh,
-                    IOobject::MUST_READ,
-                    IOobject::AUTO_WRITE
-                ),
-                mesh
-            )
-        );
+        dictionary specieDict(dict.optionalSubDict(speciesNames[speciesi]));
+        specieDict = specieDict.optionalSubDict(porousRegion);
+        dictionary porousTransport(specieDict.subDict("porousTransport"));
 
-        dictionary speciesDict(dict.optionalSubDict(speciesNames[speciesi]));
-        dictionary porousTransport(speciesDict.subDict("porousTransport"));
-
-        dimensionedScalar Kd(porousTransport.lookupOrDefault("Kd",dimensionedScalar("Kd_default",dimensionSet(-1,3,0,0,0),0.)));
+        dimensionedScalar Kd(porousTransport.lookupOrDefault("Kd", dimensionedScalar(dimensionSet(-1,3,0,0,0), 0)));
         Kd_[speciesi] = Kd.value();
-        dimensionedScalar rs(porousTransport.lookupOrDefault("rs",dimensionedScalar("rs_default",dimensionSet(1,-3,0,0,0),0.)));
+        dimensionedScalar rs(porousTransport.lookupOrDefault("rs", dimensionedScalar(dimensionSet(1,-3,0,0,0), 0)));
         rs_[speciesi] = rs.value();
-        dimensionedScalar epsTotal(porousTransport.lookupOrDefault("epsTotal",dimensionedScalar("epsTotal_default",dimless,1.)));
+        dimensionedScalar epsTotal(porousTransport.lookupOrDefault("epsTotal", dimensionedScalar(dimless, 1)));
         epsTotal_[speciesi] = epsTotal.value();
 
         lambdas_[speciesi].dimensions().reset(dimensionSet(0,0,-1,0,0));
-        lambdas_[speciesi] = porousTransport.lookupOrDefault("lambda",dimensionedScalar("lambda_default",dimensionSet(0,0,-1,0,0),0.));
+        lambdas_[speciesi] = porousTransport.lookupOrDefault("lambda", dimensionedScalar(dimensionSet(0,0,-1,0,0), 0));
 
-        Info << nl << "porousTransport parameters" << nl << "{" << endl;
+        if (porousRegion != "")
+        {
+            Info << nl << "porousTransport " << porousRegion << " parameters" << nl << "{" << endl;
+        }
+        else
+        {
+            Info << nl << "porousTransport parameters" << nl << "{" << endl;
+        }
         Info << "    " << Kd.name() << " : " << Kd.value() << endl;
         Info << "    " << rs.name() << " : " << rs.value() << endl;
         Info << "    " << epsTotal.name() << " : " << epsTotal.value() << endl;
@@ -107,7 +98,7 @@ inline Foam::multiscalarMixture::multiscalarMixture
             (
                 IOobject
                 (
-                    Y_[speciesi].name() + "_R",
+                    Y(speciesi).name() + porousRegion + "_R",
                     mesh.time().timeName(),
                     mesh,
                     IOobject::NO_READ,
@@ -119,25 +110,24 @@ inline Foam::multiscalarMixture::multiscalarMixture
                 zeroGradientFvPatchField<scalar>::typeName
             )
         );
-
-        R_[speciesi].primitiveFieldRef() = 1 + (1-epsTotal_[speciesi]) * rs_[speciesi] * Kd_[speciesi] / eps;
+        R_[speciesi].primitiveFieldRef() = 1 + (1-epsTotal_[speciesi]) * rs_[speciesi] * Kd_[speciesi] / eps_;
         Info << "Min(R) = " << gMin(R_[speciesi]) << " Max(R) = " << gMax(R_[speciesi]) << endl;
 
         //- creation of dispersion model
-        dispersionModels_.set(speciesi, dispersionModel::New("DeffModel", speciesDict, mesh));
+        dispersionModels_.set(speciesi, dispersionModel::New("DeffModel", specieDict, mesh));
 
         //Handle source events
 
-        const dimensionSet dimSourceTerm = Y_[speciesi].dimensions()*sourceTermDimFactor/dimTime;
+        const dimensionSet dimSourceTerm = Y(speciesi).dimensions()*sourceTermDimFactor/dimTime;
 
         //- read source event if present
-        if(speciesDict.found("eventFileTracerSource"))
+        if(specieDict.found("sourceEventFileTracer"))
         {
-            word sourceEventFileName = speciesDict.lookupOrDefault<word>("eventFileTracerSource","");
+            word sourceEventFileName = specieDict.lookupOrDefault<word>("sourceEventFileTracer","");
             sourceEvents_.set(speciesi, new sourceEventFile(sourceEventFileName));
 
             const word& dtFieldName = 
-                sourceEventDtFieldNameOverride.empty() ? Y_[speciesi].name() : sourceEventDtFieldNameOverride;
+                sourceEventDtFieldNameOverride.empty() ? Y(speciesi).name() : sourceEventDtFieldNameOverride;
 
             sourceEvents_.last().setTimeScheme(dtFieldName, mesh);
             sourceEvents_.last().setFieldDimensions(dimSourceTerm);
@@ -150,7 +140,7 @@ inline Foam::multiscalarMixture::multiscalarMixture
             else
             {
                 FatalErrorIn("multiscalarMixtureI.H")
-                    << "eventFileTracerSource used with an incompatible solver"
+                    << "sourceEventFileTracer used with an incompatible solver"
                     << abort(FatalError);
             }
 
@@ -180,6 +170,8 @@ inline Foam::multiscalarMixture::multiscalarMixture
     } 
 
 }
+
+// Foam::multiscalarMixture::~multiscalarMixture {};
 
 // * * * * * * * * * * * * * Member Functions * * * * * * * * * * * * //
 
@@ -248,17 +240,15 @@ inline const Foam::dimensionedScalar& Foam::multiscalarMixture::lambda(const lab
     return lambdas_[speciesi];
 }
 
-template<typename ThetaType>
 inline void Foam::multiscalarMixture::correct
 (
     const volVectorField& U,
-    const ThetaType& theta
+    const volScalarField& theta
 )
 {
-    forAll(Y_, speciesi)
+    forAll(Y(), speciesi)
     {
-
-        dispersionModels_[speciesi].correct(Y_[speciesi], U, theta);
+        dispersionModels_[speciesi].correct(Y(speciesi), U, theta);
         R_[speciesi].primitiveFieldRef() = 1 + (1-epsTotal_[speciesi]) * rs_[speciesi] * Kd_[speciesi] / theta;
         if(sourceEvents_(speciesi))
         {
@@ -267,17 +257,17 @@ inline void Foam::multiscalarMixture::correct
     }
 }
 
-template<typename SaturationType, typename EpsType>
 inline void Foam::multiscalarMixture::correct
 (
     const volVectorField& U,
-    const SaturationType& saturation,
-    const EpsType& eps
+    const volScalarField& saturation,
+    const volScalarField& eps
 )
 {
+
     forAll(Y(), speciesi)
     {
-        dispersionModels_[speciesi].correct(Y_[speciesi], U, saturation, eps);
+        dispersionModels_[speciesi].correct(Y(speciesi), U, saturation, eps);
         R_[speciesi].primitiveFieldRef() = 1 + (1-epsTotal_[speciesi]) * rs_[speciesi] * Kd_[speciesi] / (eps*saturation);
         if(sourceEvents_(speciesi))
         {
@@ -286,6 +276,10 @@ inline void Foam::multiscalarMixture::correct
     }
 }
 
+inline const Foam::dimensionedScalar& Foam::multiscalarMixture::Dm(const label speciesi) const
+{
+    return dispersionModels_[speciesi].Dm();
+}
 
 inline const Foam::volTensorField& Foam::multiscalarMixture::Deff(const label speciesi) const
 {

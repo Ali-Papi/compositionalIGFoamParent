@@ -51,98 +51,71 @@ addToRunTimeSelectionTable
 
 Foam::capillarityModels::pcVanGenuchten::pcVanGenuchten
 (
-    const word& name,
+    const fvMesh& mesh,
     const dictionary& transportProperties,
-    const volScalarField& Sb
+    const word& Sname,
+    const word porousRegion
 )
     :
-    capillarityModel(name, transportProperties,Sb),
-    pcVanGenuchtenCoeffs_(transportProperties.subDict(typeName + "Coeffs")),
-    Smin_
-    (
-        IOobject
-        (
-            Sb_.name()+"min",
-            Sb_.time().timeName(),
-            Sb_.db(),
-            IOobject::READ_IF_PRESENT,
-            IOobject::NO_WRITE
-        ),
-        Sb.mesh(),
-        transportProperties.lookupOrDefault(Sb_.name()+"min",dimensionedScalar(Sb_.name()+"min",dimless,0))
-    ),
-    Smax_
-    (
-        IOobject
-        (
-            Sb_.name()+"max",
-            Sb_.time().timeName(),
-            Sb_.db(),
-            IOobject::READ_IF_PRESENT,
-            IOobject::NO_WRITE
-        ),
-        Sb.mesh(),
-        transportProperties.lookupOrDefault(Sb_.name()+"max",dimensionedScalar(Sb_.name()+"max",dimless,0))
-    ),
+    capillarityModel(mesh, transportProperties.subDict(typeName + "Coeffs"), Sname, porousRegion),
     m_
     (
         IOobject
         (
-            "m",
-            Sb_.time().timeName(),
-            Sb_.db(),
+            "m"+porousRegion,
+            mesh.time().timeName(),
+            mesh,
             IOobject::READ_IF_PRESENT,
             IOobject::NO_WRITE
         ),
-        Sb.mesh(),
-        dimensionedScalar("m",dimless,pcVanGenuchtenCoeffs_.lookupOrDefault<scalar>("m",0))
+        mesh,
+        dimensionedScalar(dimless, capillarityProperties_.lookupOrDefault<scalar>("m"+porousRegion, 0))
     ),
     n_(1/(1-m_)),
     alpha_ // necessary for Richards solver
     (
         IOobject
         (
-            "alpha",
-            Sb_.time().timeName(),
-            Sb_.db(),
+            "alpha"+porousRegion,
+            mesh.time().timeName(),
+            mesh,
             IOobject::READ_IF_PRESENT,
             IOobject::NO_WRITE
         ),
-        Sb.mesh(),
-        dimensionedScalar("alpha",dimless,pcVanGenuchtenCoeffs_.lookupOrDefault<scalar>("alpha",0))
+        mesh,
+        dimensionedScalar(dimless, capillarityProperties_.lookupOrDefault<scalar>("alpha"+porousRegion, 0))
     ),
     pc0_
     (
         IOobject
         (
-            "pc0",
-            Sb_.time().timeName(),
-            Sb_.db(),
+            "pc0"+porousRegion,
+            mesh.time().timeName(),
+            mesh,
             IOobject::READ_IF_PRESENT,
             IOobject::NO_WRITE
         ),
-        Sb.mesh(),
-        pcVanGenuchtenCoeffs_.lookupOrDefault("pc0",dimensionedScalar("pc0",dimensionSet(1,-1,-2,0,0),0.))
+        mesh,
+        dimensionedScalar(dimensionSet(1,-1,-2,0,0), capillarityProperties_.lookupOrDefault<scalar>("pc0"+porousRegion,0))
     )
 {
-    Se_ = ((Sb_-Smin_)/(Smax_-Smin_));
-    if (gMin(m_) == 0) FatalErrorIn("Foam::capillarityModels::pcVanGenuchten::pcVanGenuchten") << "m = 0 in pcVanGenuchten" << abort(FatalError);
-    Info << "Van Genuchten parameters for capillary pressure model" << nl << "{" << endl;
-    Info << "    m ";
-    if (m_.headerOk()) { Info << "read file" << endl;}
-    else {Info << average(m_).value() << endl;}
-    Info << "    pc0 ";
-    if (pc0_.headerOk()) { Info << "read file" << endl;}
-    else {Info << average(pc0_).value() << endl;}
-    Info << "    alpha ";
-    if (alpha_.headerOk()) { Info << "read file" << endl;}
-    else {Info << average(alpha_).value() << endl;}
-    Info <<  "    Smin ";
+    if (gMin(m_) == 0) FatalErrorIn("Foam::capillarityModels::pcVanGenuchten::pcVanGenuchten") << "m" << porousRegion << "=0 in pcVanGenuchten" << abort(FatalError);
+    Info << "Van Genuchten parameters for capillarity pressure model" << nl << "{" << endl;
+    Info <<  "    " << Sname << porousRegion << "min" << " ";
     if (Smin_.headerOk()) { Info << "read file" << endl;}
     else {Info << average(Smin_).value() << endl;}
-    Info << "    Smax ";
+    Info << "    " << Sname << porousRegion << "max" << " ";
     if (Smax_.headerOk()) { Info << "read file" << endl;}
     else {Info << average(Smax_).value() << endl;}
+    Info << "    m" << porousRegion << " ";
+    if (m_.headerOk()) { Info << "read file" << endl;}
+    else {Info << average(m_).value() << endl;}
+    Info << "    pc0" << porousRegion << " ";
+    if (pc0_.headerOk()) { Info << "read file" << endl;}
+    else {Info << average(pc0_).value() << endl;}
+    Info << "    alpha" << porousRegion << " ";
+    if (alpha_.headerOk()) { Info << "read file" << endl;}
+    else {Info << average(alpha_).value() << endl;}
     Info << "} \n" << endl;
     
 }

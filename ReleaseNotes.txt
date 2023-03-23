@@ -1,9 +1,114 @@
 ************************
-*** PMFvXXXX
-*** 
+*** PMF v2303
+*** Dual porosity model + readthedocs
+************************
+
+### Bug fix
+
+- parallel issue for source-injection/fixed points
+
+- parallel issue in time derivative computation (used for timesteps management) 
+
+### General
+
+- All solvers display current version of PMF.
+
+- Global reorganization of libraries for dual porosity developements.
+
+- To handle scalar transport in simple/dual porosity models, CEqn.H has been
+  moved in porousMediumTransportModel classes (and removed from solver). The
+  transport equation is solved as for example:
+
+  pmTransportModel->solveTransport(Utheta, phi, theta);
+
+### Libraries
+
+- porousMediumModel
+
+  - new class for handling porosity (eps) and permeability (K)
+
+- twophasePorousMediumModel
+
+  - new asbtract class for handling simple/dual porosity model (flow only)
+
+- simplePorosity
+
+  - porousMedium class for one porosity model (one Saturation, kr, pc...)
+
+- dualPorosity
+
+  - porousMedium class for dual porosity model (with Fracture and Matrix)
+
+- porousMediumTransportModel
+
+  - new  class for handling simple/dual porosity model (transport)
+
+- simplePorosityTransport
+
+  - porousMedium class for scalar transport in one porosity model
+
+- dualPorosityTransport
+
+  - porousMedium class for scalar transport in dual porosity model
+  (with Fracture and Matrix)
+  
+- relativePermeability/capillarity:
+
+  - Smin/Smax are common to all kr/pc model and included in general abstract. As
+  a consequence, values are now read in the model dictionary (and not from the
+  global transportProperties dict). For example, the thetamin value for
+  Van Genuchten model is read in VanGenuchtenCoeffs
+
+### Solvers
+
+- steadyGroundwaterFoam/groundwaterFoam
+
+  - solvers have been merged. Steady simulations can be done using -steady
+  option, i.e. :
+       groundwaterFoam -steady
+
+  - Picard residuals can be written in residuals.csv file by adding option in
+  controlDict (works for steady run) :
+	      writeResiduals true;
+
+- steadyGroundwater2DFoam/groundwater2DFoam
+
+  - solvers have been merge. Steady simulations can be done using -steady
+  option, i.e. :
+       groundwater2DFoam -steady
+
+- groundwaterFoam (steady mode)
+
+  - residual field and max values can be written during the run with the
+  controlDict option:
+
+  writeResiduals yes;
+
+### Tutorials
+
+- 1Dinfiltration_dualPorosity (for flow and flow+transport)
+
+  validation case for dual porosity model using METIS results
+
+### Minor changes
+
+- new kr(volfield) function added to relativePermeability classes to compute
+  relative permeability from a given saturation
+
+- new S(volfield) function added to capillaryModel classes to compute saturation
+  from a given pressure head field
+
+************************
+*** PMFv2107.2
+*** Minor fixes for PMFv2107.1
 ************************
 
 ### Bug fixes
+
+- timeStepManager
+
+  - there was issues for derivative computation when running on multiple cores.
+  timeStepManager class now uses reduce function.
 
 - sourceEventFile / 2D fixed points
 
@@ -38,6 +143,12 @@
 - groundwaterTransport2DFoam
 
   - fix dryCells (C=0 and dC/dt=0)
+
+- darcyGradPressure
+
+  - now handle dry cells (mobility=0) to avoid crash during steady iterations
+
+- multiple minor bugs
 
 ************************
 *** PMFv2107.1

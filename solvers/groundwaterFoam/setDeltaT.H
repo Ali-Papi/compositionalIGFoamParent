@@ -51,7 +51,7 @@ if(adjustTimeStep)
         if (sourceEventIsPresent) timeOfNextEvent = min(timeOfNextEvent,sourceEvent.currentEventEndTime());
         forAll(patchEventList,patchEventi) timeOfNextEvent = min(timeOfNextEvent,patchEventList[patchEventi]->currentEventEndTime());
 
-        scalar timeToNextEvent = timeOfNextEvent-runTime.timeOutputValue();
+        scalar timeToNextEvent = timeOfNextEvent-runTime.userTimeValue();
         scalar nSteps =  timeToNextEvent/runTime.deltaTValue();
         if ((nSteps < labelMax) && (nSteps != 0))
         {
@@ -65,16 +65,16 @@ if(adjustTimeStep)
             scalar timeToCloseEvent = GREAT;
             if (sourceEventIsPresent)
             {
-                if (sourceEvent.currentEventEndTime() != runTime.timeOutputValue())
+                if (sourceEvent.currentEventEndTime() != runTime.userTimeValue())
                 {
-                    timeToCloseEvent = min(timeToCloseEvent,sourceEvent.currentEventEndTime()-runTime.timeOutputValue());
+                    timeToCloseEvent = min(timeToCloseEvent,sourceEvent.currentEventEndTime()-runTime.userTimeValue());
                 }
             }
             forAll(patchEventList,patchEventi)
             {
-                if (patchEventList[patchEventi]->currentEventEndTime() != runTime.timeOutputValue())
+                if (patchEventList[patchEventi]->currentEventEndTime() != runTime.userTimeValue())
                 {
-                    timeToCloseEvent = min(timeToCloseEvent,patchEventList[patchEventi]->currentEventEndTime()-runTime.timeOutputValue());
+                    timeToCloseEvent = min(timeToCloseEvent,patchEventList[patchEventi]->currentEventEndTime()-runTime.userTimeValue());
                 }
             }
         runTime.setDeltaTNoAdjust(min(runTime.deltaTValue(),timeToCloseEvent));

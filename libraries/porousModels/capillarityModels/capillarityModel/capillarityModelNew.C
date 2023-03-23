@@ -33,37 +33,38 @@ License
 
 Foam::autoPtr<Foam::capillarityModel> Foam::capillarityModel::New
 (
- const word& name,
- const dictionary& capillarityProperties,
- const volScalarField& Sb
- )
+    const fvMesh& mesh,
+    const dictionary& capillarityProperties,
+    const word& Sname,
+    const word porousRegion
+)
 {
-  const word modelType(capillarityProperties.lookup("capillarityModel"));
+    const word modelType(capillarityProperties.lookup("capillarityModel"));
 
-  Info<< "Selecting capillarity model => " << modelType << "\n" << endl;
+    Info<< "Selecting capillarity model for field " << Sname << " => " << modelType << "\n" << endl;
 
-  auto cstrIter = dictionaryConstructorTablePtr_->find(modelType);
+    auto cstrIter = dictionaryConstructorTablePtr_->find(modelType);
 
-  if (cstrIter == dictionaryConstructorTablePtr_->end())
+    if (cstrIter == dictionaryConstructorTablePtr_->end())
     {
-      FatalErrorIn
-	(
-	 "capillarityModel::New"
-	 "("
-	 "const word& name,"
-	 "const dictionary& capillarityProperties,"
-	 "const volScalarField& Sb"
-	 ")"
-	 )
-	<< "Unknown capillarityModel type "
-	<< modelType << nl << nl
-	<< "Valid capillarityModels are : " << endl
-	<< dictionaryConstructorTablePtr_->sortedToc()
-	<< exit(FatalError);
+        FatalErrorIn
+            (
+                "capillarityModel::New"
+                "("
+                "const fvMesh& mesh,"
+                "const dictionary& capillarityProperties,"
+                "const word& Sname"
+                ")"
+            )
+            << "Unknown capillarityModel type "
+                << modelType << nl << nl
+                << "Valid capillarityModels are : " << endl
+                << dictionaryConstructorTablePtr_->sortedToc()
+                << exit(FatalError);
     }
 
-  return autoPtr<capillarityModel>
-    (cstrIter()(name, capillarityProperties,Sb));
+    return autoPtr<capillarityModel>
+        (cstrIter()(mesh, capillarityProperties, Sname, porousRegion));
 }
 
 

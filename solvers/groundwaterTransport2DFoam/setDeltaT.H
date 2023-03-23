@@ -59,7 +59,7 @@ if (adjustTimeStep)
         if (infiltrationEventIsPresent) timeOfNextEvent = min(timeOfNextEvent,infiltrationEvent.currentEventEndTime());
         forAll(sourceEventList,sourceEventi) timeOfNextEvent = min(timeOfNextEvent,sourceEventList[sourceEventi]->currentEventEndTime());
   
-        scalar timeToNextEvent = timeOfNextEvent-runTime.timeOutputValue();
+        scalar timeToNextEvent = timeOfNextEvent-runTime.userTimeValue();
         scalar nSteps =  timeToNextEvent/runTime.deltaTValue();
         if ((nSteps < labelMax) && (nSteps != 0))
         {
@@ -73,23 +73,23 @@ if (adjustTimeStep)
             scalar timeToCloseEvent = GREAT;
             if (infiltrationEventIsPresent)
             {
-                if (infiltrationEvent.currentEventEndTime() != runTime.timeOutputValue())
+                if (infiltrationEvent.currentEventEndTime() != runTime.userTimeValue())
                 {
-                    timeToCloseEvent = min(timeToCloseEvent,infiltrationEvent.currentEventEndTime()-runTime.timeOutputValue());
+                    timeToCloseEvent = min(timeToCloseEvent,infiltrationEvent.currentEventEndTime()-runTime.userTimeValue());
                 }
             }
             forAll(sourceEventList,sourceEventi) 
             {
-                if (sourceEventList[sourceEventi]->currentEventEndTime() != runTime.timeOutputValue())
+                if (sourceEventList[sourceEventi]->currentEventEndTime() != runTime.userTimeValue())
                 {
-                    timeToCloseEvent = min(timeToCloseEvent,sourceEventList[sourceEventi]->currentEventEndTime()-runTime.timeOutputValue());
+                    timeToCloseEvent = min(timeToCloseEvent,sourceEventList[sourceEventi]->currentEventEndTime()-runTime.userTimeValue());
                 }
             }
             forAll(patchEventList,patchEventi)
             {
-                if (patchEventList[patchEventi]->currentEventEndTime() != runTime.timeOutputValue())
+                if (patchEventList[patchEventi]->currentEventEndTime() != runTime.userTimeValue())
                 {
-                    timeToCloseEvent = min(timeToCloseEvent,patchEventList[patchEventi]->currentEventEndTime()-runTime.timeOutputValue());
+                    timeToCloseEvent = min(timeToCloseEvent,patchEventList[patchEventi]->currentEventEndTime()-runTime.userTimeValue());
                 }
             }
             runTime.setDeltaTNoAdjust(min(runTime.deltaTValue(),timeToCloseEvent));

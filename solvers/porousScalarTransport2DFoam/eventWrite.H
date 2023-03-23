@@ -1,7 +1,7 @@
 //- write using event file
 if (outputEventIsPresent)
 {
-    if (outputEvent.currentEventEndTime() <= runTime.timeOutputValue())
+    if (outputEvent.currentEventEndTime() <= runTime.userTimeValue())
     {
         volScalarField hwater_interpolated = outputEvent.timeInterpolate(hwater, runTime);
         surfaceScalarField phihwater_interpolated =  outputEvent.timeInterpolate(phihwater, runTime);
@@ -27,14 +27,14 @@ if (outputEventIsPresent)
                     {
                         scalarField dispersiveFlux(((Deff.boundaryField()[patchi] & mesh.boundary()[patchi].nf()) & mesh.boundary()[patchi].Sf()));
                         scalarField convectiveFlux(phihwater_interpolated.boundaryField()[patchi]*C_interpolated.boundaryField()[patchi]);
-                        CmassBalanceCSV << " " << sum(dispersiveFlux*fvc::snGrad(C_interpolated)+convectiveFlux)/zScale;
+                        CmassBalanceCSV << " " << gSum(dispersiveFlux*fvc::snGrad(C_interpolated)+convectiveFlux)/zScale;
                     }
                 }
                 CmassBalanceCSV << " " << fvc::domainIntegrate(seepageTerm*C_interpolated).value()/zScale << endl;
             }
         }
 
-        outputEvent.updateIndex(runTime.timeOutputValue());
+        outputEvent.updateIndex(runTime.userTimeValue());
     }
 }
 //- write using openfoam usual runTime
@@ -60,7 +60,7 @@ else
                 {
                     scalarField dispersiveFlux(((Deff.boundaryField()[patchi] & mesh.boundary()[patchi].nf()) & mesh.boundary()[patchi].Sf()));
                     scalarField convectiveFlux(phihwater.boundaryField()[patchi]*C.boundaryField()[patchi]);
-                    CmassBalanceCSV << " " << sum(dispersiveFlux*fvc::snGrad(C)+convectiveFlux)/zScale;
+                    CmassBalanceCSV << " " << gSum(dispersiveFlux*fvc::snGrad(C)+convectiveFlux)/zScale;
                 }
             }
             CmassBalanceCSV << " " << fvc::domainIntegrate(seepageTerm*C).value()/zScale << endl;

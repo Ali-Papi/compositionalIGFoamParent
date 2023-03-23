@@ -38,6 +38,7 @@ Description
 #include "fvCFD.H"
 #include "harmonic.H"
 #include "incompressiblePhase.H"
+#include "twophasePorousMediumModel.H"
 #include "capillarityModel.H"
 #include "relativePermeabilityModel.H"
 #include "sourceEventFile.H"
@@ -51,6 +52,7 @@ using namespace Foam;
 int main(int argc, char *argv[])
 {
     #include "setRootCase.H"
+    #include "../headerPMF.H"
     #include "createTime.H"
     #include "createMesh.H"
     #include "createTimeControls.H"
@@ -66,8 +68,8 @@ int main(int argc, char *argv[])
 
     while (runTime.run())
     {
-        if (sourceEventIsPresent) sourceEvent.updateIndex(runTime.timeOutputValue());
-        forAll(patchEventList,patchEventi) patchEventList[patchEventi]->updateIndex(runTime.timeOutputValue());
+        if (sourceEventIsPresent) sourceEvent.updateIndex(runTime.userTimeValue());
+        forAll(patchEventList,patchEventi) patchEventList[patchEventi]->updateIndex(runTime.userTimeValue());
         #include "setDeltaT.H"
 
         runTime++;

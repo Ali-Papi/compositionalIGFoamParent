@@ -1,4 +1,4 @@
-/*---------------------------------------------------------------------------*\
+/*---------------------------------------------------------------------------* \
   		  _______  ____    ____  ________  
  		 |_   __ \|_   \  /   _||_   __  | 
    		   | |__) | |   \/   |    | |_ \_| 
@@ -41,13 +41,18 @@ Description
 #include "sourceEventFile.H"
 #include "outputEventFile.H"
 #include "timestepManager.H"
+#include "simpleControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 using namespace Foam;
 
 int main(int argc, char *argv[])
 {
+    argList::addBoolOption("steady", "to run steady flow simulation");
+;
     #include "setRootCase.H"
+    #include "../headerPMF.H"
+    bool steady = args.optionFound("steady");
     #include "createTime.H"
     #include "createMesh.H"
     #include "createFields.H"
@@ -61,16 +66,22 @@ int main(int argc, char *argv[])
 
     while (runTime.run())
     {
-        if (infiltrationEventIsPresent) infiltrationEvent.updateIndex(runTime.timeOutputValue());
-        if (waterSourceEventIsPresent) waterSourceEvent.updateIndex(runTime.timeOutputValue());
-        #include "setDeltaT.H"
+        if (!steady)
+        {
+            if (infiltrationEventIsPresent) infiltrationEvent.updateIndex(runTime.userTimeValue());
+            if (waterSourceEventIsPresent) waterSourceEvent.updateIndex(runTime.userTimeValue());
+            #include "setDeltaT.H"
+        }
 
         runTime++;
 
         Info << "Time = " << runTime.timeName() << nl << endl;
 
         //- Update infiltration term
-        #include "computeInfiltration.H"
+        if (!steady)
+        {
+            #include "computeInfiltration.H"
+        }
 
         //- Solve potential equation
         #include "potentialEqn.H"
@@ -78,14 +89,29 @@ int main(int argc, char *argv[])
         //- Water mass balance computation
         #include "waterMassBalance.H"
 
+        //- Residual computation
+        if (steady)
+        {
+            if (maxResidual < residualPotential)
+            {
+                runTime.writeAndEnd();
+            }
+            else
+            {
+                runTime.write();
+            }
+        }
+        else
+        {
         #include "eventWrite.H"
+        }
 
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
             << "  ClockTime = " << runTime.elapsedClockTime() << " s"
             << nl << endl;
     }
 
-    if (cumulativeWaterAdded > 0) Info << "Cumulated water added = " << cumulativeWaterAdded << " m3, equivalent height = " << cumulativeWaterAdded*zScale/sum(mesh.V()).value() << " m" << nl << endl;
+    if (cumulativeWaterAdded > 0) Info << "Cumulated water added = " << cumulativeWaterAdded << " m3, equivalent height = " << cumulativeWaterAdded*zScale/gSum(mesh.V()) << " m" << nl << endl;
     Info<< "End\n" << endl;
 
     return 0;

@@ -1,8 +1,8 @@
-forAll(sourceEventList,sourceEventi)
+forAll(tracerSourceEventList,sourceEventi)
 {
-	sourceEventList[sourceEventi]->updateIndex(runTime.startTime().value());
-	sourceEventList[sourceEventi]->updateValue(runTime);
-	sourceEventList[sourceEventi]->storeOldValues();
+	tracerSourceEventList[sourceEventi]->updateIndex(runTime.startTime().value());
+	tracerSourceEventList[sourceEventi]->updateValue(runTime);
+	tracerSourceEventList[sourceEventi]->storeOldValues();
 }
 
 forAll(patchEventList,patchEventi)
@@ -12,8 +12,8 @@ forAll(patchEventList,patchEventi)
     patchEventList[patchEventi]->storeOldValues();
 }
 
-bool outputEventIsPresent = runTime.controlDict().found("eventFileOutput");
-word outputEventFileName = runTime.controlDict().lookupOrDefault<word>("eventFileOutput","");
+bool outputEventIsPresent = runTime.controlDict().found("outputEventFile");
+word outputEventFileName = runTime.controlDict().lookupOrDefault<word>("outputEventFile","");
 outputEventFile outputEvent(outputEventFileName);
 if (outputEventIsPresent)
 {

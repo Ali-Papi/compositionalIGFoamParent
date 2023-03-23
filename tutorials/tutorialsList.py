@@ -11,6 +11,7 @@ tutorials = [{'solver' : "impesFoam", 'case' : "Buckley-Leverett/BrooksAndCorey"
              {'solver' : "groundwaterFoam", 'case' : "1Dinfiltration"}, \
              {'solver' : "groundwaterFoam", 'case' : "1Dinfiltration_Ufixed"}, \
              {'solver' : "groundwaterFoam", 'case' : "1Dinfiltration_variable"}, \
+             {'solver' : "groundwaterFoam", 'case' : "1Dinfiltration_dualPorosity"}, \
              {'solver' : "groundwaterFoam", 'case' : "realCase"}, \
              {'solver' : "darcyFoam", 'case' : "SPE10"}, \
              {'solver' : "porousScalarTransportFoam", 'case' : "1DeventFlux_Euler"}, \
@@ -22,7 +23,8 @@ tutorials = [{'solver' : "impesFoam", 'case' : "Buckley-Leverett/BrooksAndCorey"
              {'solver' : "groundwater2DFoam", 'case' : "1Dwave_hFixed"}, \
              {'solver' : "groundwater2DFoam", 'case' : "1Dwave_UFixed"}, \
              {'solver' : "groundwater2DFoam", 'case' : "timeVariableInfiltration"}, \
-             {'solver' : "steadyGroundwater2DFoam", 'case' : "1Dwave_UFixed"}, \
-             {'solver' : "steadyGroundwaterFoam", 'case' : "1Dinfiltration_Ufixed"}, \
+             {'solver' : "groundwater2DFoam", 'case' : "1Dwave_UFixed_steady"}, \
+             {'solver' : "groundwaterFoam", 'case' : "1Dinfiltration_Ufixed_steady"}, \
              {'solver' : "groundwaterTransport2DFoam", 'case' : "timeVaryingCase"}, \
-             {'solver' : "groundwaterTransportFoam", 'case' : "1Dinfiltration_Ufixed"}]
+             {'solver' : "groundwaterTransportFoam", 'case' : "1Dinfiltration_Ufixed"}, \
+             {'solver' : "groundwaterTransportFoam", 'case' : "1Dinfiltration_dualPorosity"}]

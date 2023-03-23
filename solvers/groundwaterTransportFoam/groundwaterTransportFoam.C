@@ -37,6 +37,8 @@ Description
 
 #include "fvCFD.H"
 #include "incompressiblePhase.H"
+#include "twophasePorousMediumModel.H"
+#include "porousMediumTransportModel.H"
 #include "capillarityModel.H"
 #include "relativePermeabilityModel.H"
 #include "multiscalarMixture.H"
@@ -53,6 +55,7 @@ using namespace Foam;
 int main(int argc, char *argv[])
 {
     #include "setRootCase.H"
+    #include "../headerPMF.H"
     #include "createTime.H"
     #include "createMesh.H"
     #include "readGravitationalAcceleration.H"
@@ -66,14 +69,15 @@ int main(int argc, char *argv[])
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
     Info<< "\nStarting time loop\n" << endl;
+    bool steady = false;
     label iterPicard=0;
     label iterNewton=0;
 
     while (runTime.run())
     {
-        if (eventIsPresent_water)  event_water.updateIndex(runTime.timeOutputValue());
-        forAll(tracerSourceEventList,tracerSourceEventi) tracerSourceEventList[tracerSourceEventi]->updateIndex(runTime.timeOutputValue());
-        forAll(patchEventList,patchEventi) patchEventList[patchEventi]->updateIndex(runTime.timeOutputValue());
+        if (eventIsPresent_water)  event_water.updateIndex(runTime.userTimeValue());
+        forAll(tracerSourceEventList,tracerSourceEventi) tracerSourceEventList[tracerSourceEventi]->updateIndex(runTime.userTimeValue());
+        forAll(patchEventList,patchEventi) patchEventList[patchEventi]->updateIndex(runTime.userTimeValue());
         #include "setDeltaT.H"
 
         runTime++;
@@ -85,7 +89,6 @@ noConvergence :
         #include "computeSourceTerm.H"
         scalar deltahIter = 1;
         scalar hEqnResidual = 1.00001;
-        scalar hEqnResidualSigned = 0;
 
         //- 1) Richard's equation (Picard loop)
         iterPicard = 0;
@@ -94,7 +97,7 @@ noConvergence :
             iterPicard++;
             #include "hEqnPicard.H"
             #include "updateProperties.H"
-            Info << "Picard iteration " << iterPicard << ": max(deltah) = " << deltahIter << ", residual = " << hEqnResidualSigned << endl;
+            Info << "Picard iteration " << iterPicard << ": max(deltah) = " << deltahIter << ", residual = " << hEqnResidual << endl;
         }
         if ( hEqnResidual > tolerancePicard )
         {
@@ -112,7 +115,7 @@ noConvergence :
             iterNewton++;
             #include "hEqnNewton.H"
             #include "checkResidual.H"
-            Info << "Newton iteration " << iterNewton << ": max(deltah) = " << deltahIter << ", residual = " << hEqnResidualSigned << endl;
+            Info << "Newton iteration " << iterNewton << ": max(deltah) = " << deltahIter << ", residual = " << hEqnResidual << endl;
         }
         if ( hEqnResidual > toleranceNewton )
         {

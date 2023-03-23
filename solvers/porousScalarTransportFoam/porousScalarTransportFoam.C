@@ -35,6 +35,8 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "fvCFD.H"
+#include "fluidPhase.H"
+#include "porousMediumTransportModel.H"
 #include "multiscalarMixture.H"
 #include "sourceEventFile.H"
 #include "patchEventFile.H"
@@ -47,6 +49,7 @@ Description
 int main(int argc, char *argv[])
 {
     #include "setRootCase.H"
+    #include "../headerPMF.H"
     #include "createTime.H"
     #include "createMesh.H"
     #include "createFields.H"
@@ -58,8 +61,8 @@ int main(int argc, char *argv[])
 
     while (runTime.run())
     {
-        forAll(patchEventList,patchEventi) patchEventList[patchEventi]->updateIndex(runTime.timeOutputValue());
-        forAll(sourceEventList,sourceEventi) sourceEventList[sourceEventi]->updateIndex(runTime.timeOutputValue());
+        forAll(patchEventList,patchEventi) patchEventList[patchEventi]->updateIndex(runTime.userTimeValue());
+        forAll(tracerSourceEventList,sourceEventi) tracerSourceEventList[sourceEventi]->updateIndex(runTime.userTimeValue());
         #include "setDeltaT.H"
         runTime++;
 

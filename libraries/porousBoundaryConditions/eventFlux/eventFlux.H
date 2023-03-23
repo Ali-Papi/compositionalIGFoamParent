@@ -147,12 +147,6 @@ public:
             const fvPatchFieldMapper&
         );
 
-        //- Disallow copy without setting internal field reference
-        eventFlux
-        (
-            const eventFlux&
-        ) = delete ;
-
         //- Construct as copy setting internal field reference
         eventFlux
         (

@@ -41,7 +41,8 @@ Usage
 #include "fvCFD.H"
 #include "DEMfile.H"
 #include "cellSet.H"
-#include "fvMeshSubset.H"   
+#include "fvMeshSubset.H"
+#include "fvMeshTools.H"
 
 int main(int argc, char *argv[])
 {
@@ -55,8 +56,6 @@ int main(int argc, char *argv[])
     #include "createMesh.H"
     
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-    Info << "Initial number of cells = " << mesh.nCells() << endl;
 
     //- select using DEM-top file
     Info << nl << "Read DEM-top file";
@@ -72,8 +71,6 @@ int main(int argc, char *argv[])
     fvMeshSubset topMesh(mesh);
     topMesh.setCellSubset(topCells, -1, true);
     const fvMesh& interMesh = topMesh.subMesh();
-
-    Info << "Number of cells after top-cut = " << interMesh.nCells() << endl;
     
     //- select using DEM-bottom file
     Info << nl << "Read DEM-bottom file";

@@ -39,6 +39,7 @@ SourceFiles
 #ifndef multiscalarMixture_H
 #define multiscalarMixture_H
 
+#include "basicMixture.H"
 #include "volFields.H"
 #include "PtrList.H"
 #include "speciesTable.H"
@@ -46,6 +47,7 @@ SourceFiles
 
 #include "dispersionModel.H"
 #include "sourceEventFile.H"
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -57,6 +59,8 @@ namespace Foam
 \*---------------------------------------------------------------------------*/
 
 class multiscalarMixture
+:
+    public basicMixture
 {
 
 public:

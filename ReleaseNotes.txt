@@ -1,4 +1,21 @@
 ************************
+*** PMF v2310
+*** Minor fixes and compatibility
+************************
+
+### Compatibility
+
+- fix partial compatibility for Clang and v2212
+
+### Minor changes
+
+- rename libraries to PMFXXXX.so
+
+- fix keyword for output event in groundwaterTransportFoam
+
+- remove non-working mapFieldsFrom2D folder
+
+************************
 *** PMF v2303
 *** Dual porosity model + readthedocs
 ************************

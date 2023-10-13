@@ -50,6 +50,8 @@ Depending on your installation, you should switch to the github branch correspon
 
 Note that if you want to use the latest version of PMF, it is necessary to have a sufficiently recent installation of openfoam.
 
+**NOTE THAT OpenFOAM-11 and later are not supported, switch to the openfoam.com versions**
+
 The main development branch **dev** generally work with recent version from `openFOAM.com <https://www.openfoam.com/>`_ (currently v2206). Note that intermediate *December* version (i.e. v1912, v2012v, v2112...) are not tested. 
 
 Development branches
@@ -58,24 +60,25 @@ Development branches
 - branch **dev** works with OpenFOAM-v2206 `openfoam.com <https://www.openfoam.com/>`_
 - branch **dev_org** works with OpenFOAM-v10 `openfoam.org <https://www.openfoam.org/>`_
 
-Updated branches: PMFv2103.0
+Updated branches: PMFv2310.0
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+- branch **openfoam-v2306**
 - branch **openfoam-v2206**
-- branch **openfoam-v2106**
+- branch **openfoam-v10**
 
 *openfoam-v10 has errors when using postProcess/setSet in tutorials*
 
 Old branches not updated
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
+- branch **openfoam-v2106**  > PMFv2303
 - branch **openfoam-v2006**  > PMFv2107.2
 - branch **openfoam-v1906**  > PMFv2107.1
 - branch **openfoam-v1812**  > PMFv1906
 - branch **openfoam-v1806**  > PMFv1809
 - branch **openfoam-v1712**  > PMFv1805
 
-- branch **openfoam-v10**    > PMFv2107.2
 - branch **openfoam-v9**     > PMFv2107.2
 - branch **openfoam-v8**     > PMFv2107.2
 - branch **openfoam-v7**     > PMFv2107

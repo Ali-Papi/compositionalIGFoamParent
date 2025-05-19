@@ -1,5 +1,5 @@
 
-# 📌 compositionalIGFoam Repository Documentation
+# 📌 Repository Documentation
 
 [![DOI](https://img.shields.io/badge/DOI-10.3390/en17143401-blue)](https://events.interpore.org/event/46/contributions/7161/contribution.pdf)
 

@@ -1,3 +1,10 @@
+
+# 📌 compositionalIGFoam Repository Documentation
+
+[![DOI](https://img.shields.io/badge/DOI-10.3390/en17143401-blue)](https://www.mdpi.com/1996-1073/17/14/3401)
+[![DOI](https://img.shields.io/badge/DOI-10.3390/en17143401-blue)](https://events.interpore.org/event/46/contributions/7161)
+
+
 # CompositionalIGFoam
 
 This is a solver developed on top of the `porousMultiphaseFoam` project for compositional flow modeling in porous media. This has been developed based on OpenFOAM-10. It includes a new solver compositionalIGFoam for H2O / CO2 interactions.

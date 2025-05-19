@@ -1,6 +1,6 @@
 # CompositionalIGFoam
 
-This is a solver developed on top of the `porousMultiphaseFoam` project for compositional flow modeling in porous media. It includes a new solver for .
+This is a solver developed on top of the `porousMultiphaseFoam` project for compositional flow modeling in porous media. It includes a new solver compositionalIGFoam for H2O / CO2 interactions.
 
 ## Origin
 

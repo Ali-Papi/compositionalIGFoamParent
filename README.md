@@ -12,7 +12,7 @@ This is a solver developed on top of the `porousMultiphaseFoam` project for comp
 
 This code is based on [porousMultiphaseFoam](https://github.com/phorgue/porousMultiphaseFoam), originally developed by Horgue et al. (2015).
 
-# General Informations
+# General Information
 
 - This toolbox needs only a standard OpenFOAM installation
   (see www.openfoam.org or www.openfoam.com)

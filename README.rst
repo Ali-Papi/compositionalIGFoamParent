@@ -2,7 +2,7 @@ compositionalIGFoam for OpenFOAM
 =======================================
 About
 -----
-It is based on porousMultiphaseFoam (PMF):
+The code is based on porousMultiphaseFoam (PMF):
 
 porousMultiphaseFoam (PMF)
 -----

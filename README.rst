@@ -27,6 +27,6 @@ How to cite
 
 If your are using the compositionalIGFoam, please cite as follows:
 
-- [A New Straightforward Darcy-Scale Compositional Solver in OpenFOAM for CO2/Water Mutual Solubility in CO2 Storage Processes in Aquifers](https://www.mdpi.com/1996-1073/17/14/3401)
+- `A New Straightforward Darcy-Scale Compositional Solver in OpenFOAM for CO2/Water Mutual Solubility in CO2 Storage Processes in Aquifers<https://www.mdpi.com/1996-1073/17/14/3401>`_
   A. Papi, A. Jahanbakhsh, M.M. Maroto-Valer;
   *MDPI Energies  17(14), 3401*, **2024**.

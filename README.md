@@ -4,7 +4,7 @@ This is a solver developed on top of the `porousMultiphaseFoam` project for comp
 
 ## Origin
 
-This code is based on [porousMultiphaseFoam](https://github.com/horgue/porousMultiphaseFoam), originally developed by Horgue et al. (2015).
+This code is based on [porousMultiphaseFoam](https://github.com/phorgue/porousMultiphaseFoam), originally developed by Horgue et al. (2015).
 
 # General Informations
 

@@ -1,52 +1,10 @@
----
-		 _______  ____    ____  ________  
- 		 |_   __ \|_   \  /   _||_   __  | 
-   		   | |__) | |   \/   |    | |_ \_| 
-   		   |  ___/  | |\  /| |    |  _|    
-    		  _| |_    _| |_\/_| |_  _| |_     
-   		 |_____|  |_____||_____||_____|    
+# CompositionalIGFoam
 
-**** PorousMultiphaseFoam (PMF) for OpenFOAM ****
+This is a solver developed on top of the `porousMultiphaseFoam` project for compositional flow modeling in porous media. It includes a new solver for .
 
----
+## Origin
 
-# Branches
-
-## Development branches: dev works with OpenFOAM-v2106
-
-- branch **dev** works with OpenFOAM-v2106 (openfoam.com)
-- branch **dev_org** works with OpenFOAM-v9 (openfoam.org)
-
-## The current branches (last version of the toolbox)
-
-- branch **openfoam-v2106** > PMFv2107.1
-- branch **openfoam-v2006** > PMFv2107.1
-- branch **openfoam-v1906** > PMFv2107.1
-- branch **openfoam-v9**    > PMFv2107.1
-- branch **openfoam-v8**    > PMFv2107.1
-
-
-## Old branches not updated
-
-- branch **openfoam-v7**     > PMFv2107
-- branch **openfoam-v1812**  > PMFv1906
-- branch **openfoam-v6**     > PMFv1906
-- branch **openfoam-v5**     > PMFv1809
-- branch **foam-extend-4.0** > PMFv1809
-- branch **openfoam-v1806**  > PMFv1809
-- branch **openfoam-v1712**  > PMFv1805
-
-## Older version (no branches)
-
-- OpenFOAM 4.0	PMFv1.4.1
-- OpenFOAM 3.0	PMFv1.2
-
-## version not supported:
-
-- OpenFOAM 2.4 and older
-- foam-extend 3.2 and older
-- OpenFOAM v1706 and older
-- OpenFOAM v1812/v1912/v2012
+This code is based on [porousMultiphaseFoam](https://github.com/horgue/porousMultiphaseFoam), originally developed by Horgue et al. (2015).
 
 # General Informations
 

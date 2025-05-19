@@ -1,8 +1,10 @@
-porousMultiphaseFoam (PMF) for OpenFOAM
+compositionalIGFoam for OpenFOAM
 =======================================
-
 About
 -----
+It is based on PMF: 
+porousMultiphaseFoam (PMF) for OpenFOAM
+=======================================
 
 **PMF** is an open-source toolbox dedicated to simulation of flow and transport processes in porous media.
 
@@ -20,19 +22,11 @@ For information about installation, usage or numerical details, you should read 
 
 Improvements and bugs fixes are registered in the **ReleaseNotes.txt** file.
 
-How to cite PMF
+How to cite
 ---------------
 
-If your are using the PMF toolbox (directly or as a base-code) for a scientific publication, please cite at least one of the main references.
+If your are using the compositionalIGFoam, please cite as follows:
 
-The initial paper :
-
-- `An open-source toolbox for multiphase flow in porous media <https://www.sciencedirect.com/science/article/pii/S0010465514003403>`_
-  P Horgue, C Soulaine, J Franc, R Guibert, G Debenest
-  *Computer Physics Communications 187, 217-226*, **2015**
-
-and/or the hydrological module:
-
-- `porousMultiphaseFoam v2107: An open-source tool for modeling saturated/unsaturated water flows and solute transfers at watershed scale <https://www.sciencedirect.com/science/article/pii/S0010465521003908>`_
-  P Horgue, F Renard, GS Gerlero, R Guibert, G Debenest
-  *Computer Physics Communications 273,108278*, **2022**
+- [A New Straightforward Darcy-Scale Compositional Solver in OpenFOAM for CO2/Water Mutual Solubility in CO2 Storage Processes in Aquifers](https://www.mdpi.com/1996-1073/17/14/3401)
+  A. Papi, A. Jahanbakhsh, M.M. Maroto-Valer;
+  *MDPI Energies  17(14), 3401*, **2024**.

@@ -6,7 +6,7 @@
 
 # CompositionalIGFoam
 
-This is a solver developed on top of the `porousMultiphaseFoam` project for compositional flow modeling in porous media. This has been developed based on OpenFOAM-10.
+This is a solver developed on top of the `porousMultiphaseFoam` project for compositional flow modeling in porous media. This has been developed based on OpenFOAM-v10.
 ## Origin
 
 This code is based on [porousMultiphaseFoam](https://github.com/phorgue/porousMultiphaseFoam), originally developed by Horgue et al. (2015).
@@ -16,7 +16,7 @@ This code is based on [porousMultiphaseFoam](https://github.com/phorgue/porousMu
 - This toolbox needs only a standard OpenFOAM installation
   (see www.openfoam.org or www.openfoam.com)
 
-- Please cite the related paper in the "doc" folder if you are using this
+- Please cite the related paper in the `doc` folder if you are using this
   toolbox.
 
 - Read the COPYING_OPENFOAM file for information about OpenFOAM and this

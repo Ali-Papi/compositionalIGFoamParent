@@ -21,7 +21,6 @@ Documentation
 
 For information about installation, usage or numerical details, you should read the `PMF documentation <https://porousmultiphasefoam.readthedocs.io/en/dev>`_
 
-Improvements and bugs fixes are registered in the **ReleaseNotes.txt** file.
 
 How to cite
 ---------------

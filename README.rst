@@ -4,7 +4,7 @@ About
 -----
 It is based on PMF: 
 porousMultiphaseFoam (PMF) for OpenFOAM
----
+-----
 
 **PMF** is an open-source toolbox dedicated to simulation of flow and transport processes in porous media.
 

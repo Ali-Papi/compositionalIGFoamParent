@@ -19,7 +19,7 @@ The developed model is the first of its kind in OpenFOAM to address CO2/water in
 [![DOI](https://img.shields.io/badge/DOI-10.3390/en17143401-blue)](https://events.interpore.org/event/46/contributions/7161/contribution.pdf)
 
 
-# CompositionalIGFoam
+# compositionalIGFoam
 
 This is a solver developed on top of the `porousMultiphaseFoam` project for compositional flow modeling in porous media. This has been developed based on OpenFOAM-v10.
 >>>>>>> 0fa9ab48293c1c125adbf13cbd3c87907aca4a50
@@ -58,7 +58,7 @@ It is based on the OpenFOAM environment and therefore benefits from its multiple
 
 > source /opt/openfoamv6/etc/bashrc
 
-- then in the "porousMultiphaseFoam" directory, run :
+- then in the "compositionalIGFoam" directory, run :
 
 > ./Allwmake -jX
 

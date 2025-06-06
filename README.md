@@ -1,6 +1,5 @@
-<<<<<<< HEAD
 
-# ?? compositionalIGFoam Repository Documentation
+# 📌 compositionalIGFoam Repository Documentation
 
 [![DOI](https://img.shields.io/badge/DOI-10.3390/en17143401-blue)](https://www.mdpi.com/1996-1073/17/14/3401)
 [![DOI](https://img.shields.io/badge/DOI-10.3390/en17143401-blue)](https://events.interpore.org/event/46/contributions/7161)
@@ -12,38 +11,20 @@ About
 This code is developed on top of the `PorousMultiphaseFoam(PMF)` project for compositional flow modeling in porous media. It has been developed based on OpenFOAM-v10 and includes a new solver (compositionalIGFoam) for H2O / CO2 interactions by [`Papi et al. (2024)`](https://www.mdpi.com/1996-1073/17/14/3401). The impesFoam solver of the PMF package has been modified to accommodate a compositional solver. The Henry's and Raoult's laws are implemented to account for the concentration of CO2 and H2O components in the liquid and gas phases by assuming an equilibrium condition. So no species transport equation is needed to be solved.
 The developed model is the first of its kind in OpenFOAM to address CO2/water interactions in a multi-phase flow at the Darcy scale.
 
-=======
-
-# 📌 Repository Documentation
-
-[![DOI](https://img.shields.io/badge/DOI-10.3390/en17143401-blue)](https://events.interpore.org/event/46/contributions/7161/contribution.pdf)
-
-
-# CompositionalIGFoam
-
-This is a solver developed on top of the `porousMultiphaseFoam` project for compositional flow modeling in porous media. This has been developed based on OpenFOAM-v10.
->>>>>>> 0fa9ab48293c1c125adbf13cbd3c87907aca4a50
 ## Origin
 
-This code is based on [porousMultiphaseFoam(PMF)](https://github.com/phorgue/porousMultiphaseFoam), originally developed by Horgue et al. (2015).
+This code is based on porousMultiphaseFoam(PMF), originally developed by Horgue et al. (2015).
 
-<<<<<<< HEAD
 **PMF** is an open-source toolbox dedicated to simulation of flow and transport processes in porous media.
-=======
-# General Information
->>>>>>> 0fa9ab48293c1c125adbf13cbd3c87907aca4a50
 
 It is based on the OpenFOAM environment and therefore benefits from its multiple feature such as pre-and post-processing tools or parallel efficiency for example.
 
-<<<<<<< HEAD
 
 # General Information
 
 - This toolbox needs only a standard OpenFOAM installation and is compatible with the OpenFOAM-v10
   (see www.openfoam.org or www.openfoam.com).
 
-=======
->>>>>>> 0fa9ab48293c1c125adbf13cbd3c87907aca4a50
 - Please cite the related paper in the `doc` folder if you are using this
   toolbox.
 
@@ -84,12 +65,12 @@ It is based on the OpenFOAM environment and therefore benefits from its multiple
 ---
 
 
-## ?? Test Case Documentation
+## 🧪 Test Case Documentation
 
 An individual test case can be found in the following folder:
 
-- ?? CO2 injection into a water-saturated core model
-  ? [View Markdown](tutorials/compositionalIGFoam-tutorials/coreInjection/co2InjectionCore)
+- 📄 CO2 injection into a water-saturated core model
+  ↳ [View Markdown](tutorials/compositionalIGFoam-tutorials/coreInjection/co2InjectionCore)
 
 ---
 

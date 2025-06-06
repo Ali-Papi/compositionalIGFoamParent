@@ -11,7 +11,7 @@ About
 This code is developed on top of the `PorousMultiphaseFoam(PMF)` project for compositional flow modeling in porous media. It has been developed based on OpenFOAM-v10 and includes a new solver (compositionalIGFoam) for H2O / CO2 interactions by [`Papi et al. (2024)`](https://www.mdpi.com/1996-1073/17/14/3401). The impesFoam solver of the PMF package has been modified to accommodate a compositional solver. The Henry's and Raoult's laws are implemented to account for the concentration of CO2 and H2O components in the liquid and gas phases by assuming an equilibrium condition. So no species transport equation is needed to be solved.
 The developed model is the first of its kind in OpenFOAM to address CO2/water interactions in a multi-phase flow at the Darcy scale.
 
-<<<<<<< HEAD
+
 =======
 
 # 📌 Repository Documentation
@@ -22,9 +22,7 @@ The developed model is the first of its kind in OpenFOAM to address CO2/water in
 # compositionalIGFoam
 
 This is a solver developed on top of the `porousMultiphaseFoam` project for compositional flow modeling in porous media. This has been developed based on OpenFOAM-v10.
->>>>>>> 0fa9ab48293c1c125adbf13cbd3c87907aca4a50
-=======
->>>>>>> 89f0e176f9062eec8efa29bcf140f23998caaaff
+
 ## Origin
 
 This code is based on porousMultiphaseFoam(PMF), originally developed by Horgue et al. (2015).

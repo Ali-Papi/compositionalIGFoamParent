@@ -12,17 +12,6 @@ This code is developed on top of the `PorousMultiphaseFoam(PMF)` project for com
 The developed model is the first of its kind in OpenFOAM to address CO2/water interactions in a multi-phase flow at the Darcy scale.
 
 
-=======
-
-# 📌 Repository Documentation
-
-[![DOI](https://img.shields.io/badge/DOI-10.3390/en17143401-blue)](https://events.interpore.org/event/46/contributions/7161/contribution.pdf)
-
-
-# compositionalIGFoam
-
-This is a solver developed on top of the `porousMultiphaseFoam` project for compositional flow modeling in porous media. This has been developed based on OpenFOAM-v10.
-
 ## Origin
 
 This code is based on porousMultiphaseFoam(PMF), originally developed by Horgue et al. (2015).
